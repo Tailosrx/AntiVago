@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import api from "../../services/api";
-import CreateReadingForm from "../../components/Forms/CreateReadingForm";
-import ReadingCard from "../../components/Dashboard/ReadingCard";
-
+import Sidebar from "../../components/Layout/Sidebar";
+import DailyQuests from "../../components/Dashboard/DailyQuests";
+import CurrentlyReading from "../../components/Dashboard/CurrentlyReading";
+import Leaderboard from "../../components/Dashboard/Leaderboard";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
