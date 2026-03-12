@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== USERS =====
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  username  String  @unique
+  password  String
+  avatar    String?
+  bio       String?
+  
+  // Gamification
+  level     Int     @default(1)
+  points    Int     @default(0)
+  
+  // Relations
+  readings  ReadingEntry[]
+  games     GameEntry[]
+  animes    AnimeEntry[]
+  achievements UserAchievement[]
+  collection UserCollection?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([username])
+}
+
+// ===== READING ENTRIES =====
+model ReadingEntry {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title     String
+  author    String?
+  category  String
+  rating    Int?    @db.SmallInt
+  status    String  @default("reading")
+  review    String?
+  isFavorite Boolean @default(false)
+  
+  startedAt DateTime?
+  finishedAt DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([category])
+}
+
+// ===== GAME ENTRIES =====
+model GameEntry {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title     String
+  category  String
+  platform  String?
+  rating    Int?    @db.SmallInt
+  status    String  @default("playing")
+  review    String?
+  isFavorite Boolean @default(false)
+  hoursPlayed Int   @default(0)
+  
+  startedAt DateTime?
+  completedAt DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([category])
+}
+
+// ===== ANIME ENTRIES =====
+model AnimeEntry {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title     String
+  episodes  Int     @default(0)
+  status    String  @default("watching")
+  rating    Int?    @db.SmallInt
+  review    String?
+  isFavorite Boolean @default(false)
+  
+  startedAt DateTime?
+  completedAt DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+}
+
+// ===== ACHIEVEMENTS =====
+model Achievement {
+  id        Int     @id @default(autoincrement())
+  name      String
+  description String?
+  type      String
+  category  String?
+  iconUrl   String?
+  points    Int     @default(10)
+  
+  requirementType String?
+  requirementCount Int?
+  rarityPercentage Float @default(50)
+  
+  userAchievements UserAchievement[]
+  
+  createdAt DateTime @default(now())
+
+  @@index([category])
+}
+
+// ===== USER ACHIEVEMENTS =====
+model UserAchievement {
+  id            Int     @id @default(autoincrement())
+  userId        Int
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  achievementId Int
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  
+  progress      Int     @default(0)
+  unlockedAt    DateTime?
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+// ===== USER COLLECTION =====
+model UserCollection {
+  id        Int     @id @default(autoincrement())
+  userId    Int     @unique
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  totalBooks Int    @default(0)
+  totalGames Int    @default(0)
+  totalAnime Int    @default(0)
+  totalHours Int    @default(0)
+  
+  currentStage Int   @default(1)
+  stageVisual  String @default("novice")
+  
+  updatedAt DateTime @updatedAt
+}
