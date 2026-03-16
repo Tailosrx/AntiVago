@@ -1,6 +1,6 @@
-const Trophy = require("../models/Trophy");
-const UserTrophy = require("../models/UserTrophy");
-const Entry = require("../models/Entry");
+import UserTrophy from "../models/UserTrophy";
+import  Entry from "../models/Entry";
+import Trophy from "../models/Trophy";
 
 exports.getTrophyDefinitions = async (req, res) => {
   const trophies = await Trophy.find();

@@ -5,9 +5,8 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Library from './pages/Library/Library';
 import Dashboard from './pages/Dashboard/Dashboard';
-import './App.css';
 
-function App() {
+export function App() {
   const { isAuthenticated, loading, fetchUser } = useAuthStore();
 
   useEffect(() => {

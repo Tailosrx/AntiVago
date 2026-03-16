@@ -1,10 +1,10 @@
-import { listen } from './app';
-import { server } from './config/environment';
+import app from "./app.js";
+import config from "./config/environment.js";
 
-const PORT = server.port;
+const PORT = config.server.port;
 
-listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`✅ Servidor corriendo en puerto ${PORT}`);
-  console.log(`��� Ambiente: ${server.nodeEnv}`);
-  console.log(`��� Health check: http://localhost:${PORT}/health`);
+  console.log(`🌍 Ambiente: ${config.server.nodeEnv}`);
+  console.log(`💓 Health check: http://localhost:${PORT}/health`);
 });

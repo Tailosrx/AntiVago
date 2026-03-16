@@ -2,8 +2,8 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // ===== READING ENTRIES =====
-const newTrophies = await trophyService.checkAndAwardTrophies(userId);
-const updatedUser = await pointService.awardPoints(userId, 10);
+/*const newTrophies = await trophyService.checkAndAwardTrophies(userId);
+const updatedUser = await pointService.awardPoints(userId, 10);*/
 
 // CREATE: Crear lectura
 const createReading = async (req, res, next) => {

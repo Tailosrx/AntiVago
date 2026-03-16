@@ -1,7 +1,27 @@
 import { Router } from 'express';
 const router = Router();
-import { authMiddleware } from '../middleware/auth';
-import { createReading, getMyReadings, getReading, updateReading, deleteReading, createGame, getMyGames, getGame, updateGame, deleteGame, createAnime, getMyAnimes, getAnime, updateAnime, deleteAnime } from '../controllers/entriesController';
+
+import authMiddleware from '../middleware/auth.js';
+import entriesController from '../controllers/entriesController.js';
+
+
+const {
+  createReading,
+  getMyReadings,
+  getReading,
+  updateReading,
+  deleteReading,
+  createGame,
+  getMyGames,
+  getGame,
+  updateGame,
+  deleteGame,
+  createAnime,
+  getMyAnimes,
+  getAnime,
+  updateAnime,
+  deleteAnime
+} = entriesController;
 
 // Proteger todas las rutas
 router.use(authMiddleware);

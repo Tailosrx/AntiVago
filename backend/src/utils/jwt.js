@@ -1,21 +1,23 @@
-import { sign, verify } from 'jsonwebtoken';
-import { jwt as _jwt } from '../config/environment';
+import pkg from 'jsonwebtoken';
+import config from '../config/environment.js';
+
+const { sign, verify } = pkg;
 
 const generateAccessToken = (userId) => {
-  return sign({ userId }, _jwt.secret, {
-    expiresIn: _jwt.expire
+  return sign({ userId }, config.jwt.secret, {
+    expiresIn: config.jwt.expire
   });
 };
 
 const generateRefreshToken = (userId) => {
-  return sign({ userId }, _jwt.refreshSecret, {
-    expiresIn: _jwt.refreshExpire
+  return sign({ userId }, config.jwt.refreshSecret, {
+    expiresIn: config.jwt.refreshExpire
   });
 };
 
 const verifyAccessToken = (token) => {
   try {
-    return verify(token, _jwt.secret);
+    return verify(token, config.jwt.secret);
   } catch (error) {
     return null;
   }
@@ -23,7 +25,7 @@ const verifyAccessToken = (token) => {
 
 const verifyRefreshToken = (token) => {
   try {
-    return verify(token, _jwt.refreshSecret);
+    return verify(token, config.jwt.refreshSecret);
   } catch (error) {
     return null;
   }

@@ -50,15 +50,16 @@ export default function Dashboard() {
   // Calcular stage basado en totales
 
   return (
-    <div className="dashboard-layout">
+    <div className="bg-[#1B1022] text-white font-['Space_Grotesk'] flex min-h-screen w-full overflow-hidden">
+
       <Sidebar />
 
       <main className="main-content">
         <Header />
 
-        <div className="dashboard-content">
+        <div className="p-8 flex flex-col gap-8 max-w-[80rem] mx-auto w-full">
           {/* Fila superior: DailyQuests + Leaderboard */}
-          <div className="dashboard-row">
+          <div className="grid grid-cols-[2fr_1fr] gap-6">
             <DailyQuests />
             <Leaderboard />
           </div>

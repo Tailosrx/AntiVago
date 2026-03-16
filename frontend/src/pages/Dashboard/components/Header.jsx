@@ -5,25 +5,17 @@ import rayo from "../../../assets/rayo.svg";
 
 export default function Header() {
   return (
-    <div className="header">
-      <div className="header-search">
+    <div className="flex items-center content-between">
+      <div className="relative w-1/4 ml-36 mt-[5mm]">
         <img src={searchIcon} alt="" className="icon" />
         <input placeholder="Búsca en tú colección..." type="text" />
       </div>
 
       <div className="header-flex items-center gap-4">
-        <button className="header-btn">
-         <img src={notification} alt="" className="icon-img" />
-        </button>
 
-        <button className="header-btn">
+        <button className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center cursor-pointer transition duration-200 backdrop-blur-[6px]">
           <img src={settings} alt="" className="icon-img" />
         </button>
-
-        <div className="header-streak">
-          <img src={rayo} alt="" className="icon-img" />
-          <span>5 DAY STREAK</span>
-        </div>
       </div>
     </div>
   );

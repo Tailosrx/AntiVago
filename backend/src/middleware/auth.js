@@ -1,23 +1,30 @@
-const { verifyAccessToken } = require('../utils/jwt');
+import jwt from '../utils/jwt.js';
 
 const authMiddleware = (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
+    if (!authHeader) {
       return res.status(401).json({ error: 'Token no proporcionado' });
     }
 
-    const decoded = verifyAccessToken(token);
+    const token = authHeader.split(' ')[1];
+
+    const decoded = jwt.verifyAccessToken(token);
+
     if (!decoded) {
       return res.status(401).json({ error: 'Token inválido' });
     }
 
+    console.log("AUTH HEADER:", req.headers.authorization);
+
+
     req.userId = decoded.userId;
     next();
   } catch (error) {
+    console.error("Error en authMiddleware:", error);
     res.status(401).json({ error: 'Error de autenticación' });
   }
 };
 
-module.exports = { authMiddleware };
+export default authMiddleware;

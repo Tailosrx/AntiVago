@@ -1,8 +1,9 @@
-const bcryptjs = require('bcryptjs');
-const { PrismaClient } = require('@prisma/client');
-const { generateAccessToken, generateRefreshToken } = require('../utils/jwt');
-
-const prisma = new PrismaClient();
+import bcryptjs from 'bcryptjs';
+import pkg from '@prisma/client';
+import jwt from '../utils/jwt.js';
+const { PrismaClient } = pkg;
+const  prisma = new PrismaClient();
+const {generateAccessToken, generateRefreshToken} = jwt;
 
 // REGISTER: Crear nuevo usuario
 const register = async (req, res, next) => {
@@ -189,7 +190,7 @@ const refreshToken = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export default {
   register,
   login,
   getMe,

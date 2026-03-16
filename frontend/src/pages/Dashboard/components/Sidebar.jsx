@@ -1,11 +1,12 @@
 import dashboardIcon from "../../../assets/dashboard.svg";
 import libraryIcon from "../../../assets/library.svg";
 import logrosIcon from "../../../assets/logros.svg";
-import groupsIcon from "../../../assets/groups.svg";
+import { Link } from "react-router-dom";
 
 export default function Sidebar() {
   return (
-    <aside className="dashboard-sidebar">
+    <aside className="h-screen text-white bg-[#161225] backdrop-blur-[18px]
+    border-r border-[rgba(147,13,242,0.2)] flex flex-col p-4">
       <div>
         <div className="w-[20px] h-[20px] flex items-center justify-center">
           <img
@@ -15,25 +16,20 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 flex flex-col gap-2">
+      <nav className="nav-side">
         <a className="active" href="#">
           <img src={dashboardIcon} alt="Dashboard" />
           <span>Dashboard</span>
         </a>
 
-        <a href="#">
+        <Link to="/library" className="nav-item">
           <img src={libraryIcon} alt="Library" />
-          <span>Libreria</span>
-        </a>
+          <span>Librería</span>
+        </Link>
 
         <a href="#">
           <img src={logrosIcon} alt="" />
           <span>Logros</span>
-        </a>
-
-        <a href="#">
-          <img src={groupsIcon} alt="" />
-          <span>Comunidad</span>
         </a>
       </nav>
 
