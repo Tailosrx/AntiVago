@@ -1,21 +1,21 @@
-const jwt = require('jsonwebtoken');
-const config = require('../config/environment');
+import { sign, verify } from 'jsonwebtoken';
+import { jwt as _jwt } from '../config/environment';
 
 const generateAccessToken = (userId) => {
-  return jwt.sign({ userId }, config.jwt.secret, {
-    expiresIn: config.jwt.expire
+  return sign({ userId }, _jwt.secret, {
+    expiresIn: _jwt.expire
   });
 };
 
 const generateRefreshToken = (userId) => {
-  return jwt.sign({ userId }, config.jwt.refreshSecret, {
-    expiresIn: config.jwt.refreshExpire
+  return sign({ userId }, _jwt.refreshSecret, {
+    expiresIn: _jwt.refreshExpire
   });
 };
 
 const verifyAccessToken = (token) => {
   try {
-    return jwt.verify(token, config.jwt.secret);
+    return verify(token, _jwt.secret);
   } catch (error) {
     return null;
   }
@@ -23,13 +23,13 @@ const verifyAccessToken = (token) => {
 
 const verifyRefreshToken = (token) => {
   try {
-    return jwt.verify(token, config.jwt.refreshSecret);
+    return verify(token, _jwt.refreshSecret);
   } catch (error) {
     return null;
   }
 };
 
-module.exports = {
+export default {
   generateAccessToken,
   generateRefreshToken,
   verifyAccessToken,
