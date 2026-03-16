@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../services/api';
-import Sidebar from '../../components/Layout/Sidebar';
+import Sidebar from '../Dashboard/components/Sidebar';
 import LibraryCard from '../../components/Library/LibraryCard';
 
 export default function Library() {

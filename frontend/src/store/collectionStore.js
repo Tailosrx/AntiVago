@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import api from '../services/api';
+import api from '../src/services/api';
 
 const useCollectionStore = create((set) => ({
   collection: null,

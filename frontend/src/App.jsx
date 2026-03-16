@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import useAuthStore from './store/authStore';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import Library from './pages/Library/Library';
 import Dashboard from './pages/Dashboard/Dashboard';
 import './App.css';
 
