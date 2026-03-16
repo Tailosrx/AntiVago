@@ -1,26 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const { authMiddleware } = require('../middleware/auth');
-const {
-  // Reading
-  createReading,
-  getMyReadings,
-  getReading,
-  updateReading,
-  deleteReading,
-  // Game
-  createGame,
-  getMyGames,
-  getGame,
-  updateGame,
-  deleteGame,
-  // Anime
-  createAnime,
-  getMyAnimes,
-  getAnime,
-  updateAnime,
-  deleteAnime
-} = require('../controllers/entriesController');
+import { Router } from 'express';
+const router = Router();
+import { authMiddleware } from '../middleware/auth';
+import { createReading, getMyReadings, getReading, updateReading, deleteReading, createGame, getMyGames, getGame, updateGame, deleteGame, createAnime, getMyAnimes, getAnime, updateAnime, deleteAnime } from '../controllers/entriesController';
 
 // Proteger todas las rutas
 router.use(authMiddleware);
@@ -46,4 +27,4 @@ router.get('/anime/:id', getAnime);
 router.put('/anime/:id', updateAnime);
 router.delete('/anime/:id', deleteAnime);
 
-module.exports = router;
+export default router;

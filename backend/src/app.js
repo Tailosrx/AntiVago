@@ -1,15 +1,17 @@
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
-const config = require('./config/environment');
-const errorHandler = require('./middleware/errorHandler');
+import express, { json } from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
+import { cors as _cors } from './config/environment';
+import errorHandler from './middleware/errorHandler';
+import authRoutes from './routes/auth.js';
+import entriesRoutes from './routes/entries.js';
 
 const app = express();
 
 // Middlewares
-app.use(cors({ origin: config.cors.origin }));
+app.use(cors({ origin: _cors.origin }));
 app.use(morgan('dev'));
-app.use(express.json());
+app.use(json());
 
 // Health check
 app.get('/health', (req, res) => {
@@ -17,8 +19,8 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/entries', require('./routes/entries'));
+app.use('/api/auth', authRoutes);
+app.use('/api/entries', entriesRoutes);
 
 // 404
 app.use((req, res) => {
@@ -28,4 +30,4 @@ app.use((req, res) => {
 // Error handler
 app.use(errorHandler);
 
-module.exports = app;
+export default app;

@@ -1,10 +1,10 @@
-const app = require('./app');
-const config = require('./config/environment');
+import { listen } from './app';
+import { server } from './config/environment';
 
-const PORT = config.server.port;
+const PORT = server.port;
 
-app.listen(PORT, () => {
+listen(PORT, () => {
   console.log(`âœ… Servidor corriendo en puerto ${PORT}`);
-  console.log(`í¼ Ambiente: ${config.server.nodeEnv}`);
-  console.log(`í³Š Health check: http://localhost:${PORT}/health`);
+  console.log(`ï¿½ï¿½ï¿½ Ambiente: ${server.nodeEnv}`);
+  console.log(`ï¿½ï¿½ï¿½ Health check: http://localhost:${PORT}/health`);
 });
