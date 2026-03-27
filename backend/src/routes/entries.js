@@ -1,50 +1,36 @@
 import { Router } from 'express';
 const router = Router();
-
-import authMiddleware from '../middleware/auth.js';
+import  authMiddleware  from '../middleware/auth.js';
 import entriesController from '../controllers/entriesController.js';
 
-
-const {
-  createReading,
-  getMyReadings,
-  getReading,
-  updateReading,
-  deleteReading,
-  createGame,
-  getMyGames,
-  getGame,
-  updateGame,
-  deleteGame,
-  createAnime,
-  getMyAnimes,
-  getAnime,
-  updateAnime,
-  deleteAnime
-} = entriesController;
-
-// Proteger todas las rutas
 router.use(authMiddleware);
 
-// ===== READING ROUTES =====
-router.post('/reading', createReading);
-router.get('/reading', getMyReadings);
-router.get('/reading/:id', getReading);
-router.put('/reading/:id', updateReading);
-router.delete('/reading/:id', deleteReading);
+// READING
+router.post('/reading', entriesController.createReading);
+router.get('/reading', entriesController.getMyReadings);
+router.get('/reading/:id', entriesController.getReading);
+router.put('/reading/:id', entriesController.updateReading);
+router.delete('/reading/:id', entriesController.deleteReading);
 
-// ===== GAME ROUTES =====
-router.post('/game', createGame);
-router.get('/game', getMyGames);
-router.get('/game/:id', getGame);
-router.put('/game/:id', updateGame);
-router.delete('/game/:id', deleteGame);
+// GAME
+router.post('/game', entriesController.createGame);
+router.get('/game', entriesController.getMyGames);
+router.get('/game/:id', entriesController.getGame);
+router.put('/game/:id', entriesController.updateGame);
+router.delete('/game/:id', entriesController.deleteGame);
 
-// ===== ANIME ROUTES =====
-router.post('/anime', createAnime);
-router.get('/anime', getMyAnimes);
-router.get('/anime/:id', getAnime);
-router.put('/anime/:id', updateAnime);
-router.delete('/anime/:id', deleteAnime);
+// ANIME
+router.post('/anime', entriesController.createAnime);
+router.get('/anime', entriesController.getMyAnimes);
+router.get('/anime/:id', entriesController.getAnime);
+router.put('/anime/:id', entriesController.updateAnime);
+router.delete('/anime/:id', entriesController.deleteAnime);
+
+
+//Juntitos
+router.get('/', entriesController.getAllEntries);
+router.put('/:id', entriesController.updateEntry);
+router.delete('/:id', entriesController.deleteReading);
+router.post('/', entriesController.createReading);
 
 export default router;

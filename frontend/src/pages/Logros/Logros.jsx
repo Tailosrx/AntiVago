@@ -2,16 +2,16 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import api from "../../services/api";
 import Sidebar from "../Dashboard/components/Sidebar";
-import SectionBook from "./components/SectionBook";
 import Header from "../Dashboard/components/Header";
+import AchievementCard from "./components/AchievementCard";
+import AchievementsSection from "./components/AchievementSection";
 
-export default function Library() {
+export default function Logros() {
   const { user, logout } = useAuth();
   const [readings, setReadings] = useState([]);
   const [games, setGames] = useState([]);
   const [animes, setAnimes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("books");
 
   useEffect(() => {
     const loadData = async () => {
@@ -32,8 +32,6 @@ export default function Library() {
     loadData();
   }, []);
 
-  const total = readings.length + (games?.length || 0) + (animes?.length || 0);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
@@ -42,24 +40,37 @@ export default function Library() {
             <div className="h-16 w-16 border-4 border-purple-500 border-t-pink-500 rounded-full"></div>
           </div>
           <p className="text-white text-lg font-semibold">
-            Cargando tu librería...
+            Cargando tus logros...
           </p>
         </div>
       </div>
     );
   }
 
+
+
+ 
+
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
-      {/* SIDEBAR */}
       <Sidebar />
 
-      {/* RIGHT SIDE */}
       <div className="flex flex-col flex-1">
         <Header />
 
         <main className="flex-1 px-0 py-0 lg:px-20">
-          <SectionBook readings={readings} games={games} animes={animes} />
+          {/* 🏆 Título */}
+          <h2 className="text-4xl font-bold mt-10 mb-6">Logros</h2>
+
+          {/* ⭐ Barra de progreso general */}
+          
+
+          {/* 🧩 AQUÍ SOLO VA LA SECCIÓN COMPLETA */}
+          <AchievementsSection
+            readings={readings}
+            games={games}
+            animes={animes}
+          />
         </main>
       </div>
     </div>

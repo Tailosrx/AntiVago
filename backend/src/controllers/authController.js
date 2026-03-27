@@ -126,7 +126,7 @@ const login = async (req, res, next) => {
   }
 };
 
-// GET ME: Obtener usuario actual
+
 const getMe = async (req, res, next) => {
   try {
     const userId = req.userId; // Del middleware auth

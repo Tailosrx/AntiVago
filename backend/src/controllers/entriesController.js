@@ -8,15 +8,16 @@ const updatedUser = await pointService.awardPoints(userId, 10);*/
 // CREATE: Crear lectura
 const createReading = async (req, res, next) => {
   try {
-    const { title, author, category, rating, status, review, isFavorite } = req.body;
+    const { title, author, category, rating, status, review, isFavorite, totalPages, currentPage } = req.body;
     const userId = req.userId;
 
-    // Validar
     if (!title || !category) {
       return res.status(400).json({ error: 'Título y categoría son requeridos' });
     }
 
-    // Crear entry
+    // Estimar total de páginas si no se proporciona
+    let estimatedPages = totalPages || estimatePages(title, author);
+
     const entry = await prisma.readingEntry.create({
       data: {
         userId,
@@ -27,19 +28,79 @@ const createReading = async (req, res, next) => {
         status: status || 'reading',
         review,
         isFavorite: isFavorite || false,
-        startedAt: new Date()
+        totalPages: estimatedPages,
+        currentPage: currentPage || 0,
+        progressPercentage: estimatedPages ? Math.round((currentPage || 0 / estimatedPages) * 100) : 0,
+        startedAt: new Date(),
+        lastUpdatedPage: new Date()
       }
     });
 
-    // Actualizar colección del usuario
     await updateUserCollection(userId, 'reading');
 
     res.status(201).json({
       message: 'Lectura creada',
-      entry
+      entry: {
+        ...entry,
+        estimatedCompletionDays: estimateCompletionDays(entry.totalPages, entry.currentPage)
+      }
     });
   } catch (error) {
     console.error('Error en createReading:', error);
+    next(error);
+  }
+};
+
+const updateReading = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+    const { title, author, category, rating, status, review, isFavorite, currentPage } = req.body;
+
+    const reading = await prisma.readingEntry.findUnique({
+      where: { id }
+    });
+
+    if (!reading) {
+      return res.status(404).json({ error: 'Lectura no encontrada' });
+    }
+
+    if (reading.userId !== userId) {
+      return res.status(403).json({ error: 'No tienes acceso a esta lectura' });
+    }
+
+    // Si se actualiza la página actual, calcular progreso
+    let progressPercentage = reading.progressPercentage;
+    if (currentPage !== undefined && reading.totalPages) {
+      progressPercentage = Math.round((currentPage / reading.totalPages) * 100);
+    }
+
+    const updated = await prisma.readingEntry.update({
+      where: { id },
+      data: {
+        title: title || reading.title,
+        author: author || reading.author,
+        category: category || reading.category,
+        rating: rating ? parseInt(rating) : reading.rating,
+        status: status || reading.status,
+        review: review !== undefined ? review : reading.review,
+        isFavorite: isFavorite !== undefined ? isFavorite : reading.isFavorite,
+        currentPage: currentPage !== undefined ? currentPage : reading.currentPage,
+        progressPercentage: progressPercentage,
+        finishedAt: status === 'completed' ? new Date() : reading.finishedAt,
+        lastUpdatedPage: currentPage !== undefined ? new Date() : reading.lastUpdatedPage
+      }
+    });
+
+    res.json({
+      message: 'Lectura actualizada',
+      entry: {
+        ...updated,
+        estimatedCompletionDays: estimateCompletionDays(updated.totalPages, updated.currentPage)
+      }
+    });
+  } catch (error) {
+    console.error('Error en updateReading:', error);
     next(error);
   }
 };
@@ -76,7 +137,7 @@ const getReading = async (req, res, next) => {
     const userId = req.userId;
 
     const reading = await prisma.readingEntry.findUnique({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     if (!reading) {
@@ -94,48 +155,6 @@ const getReading = async (req, res, next) => {
   }
 };
 
-// UPDATE: Actualizar lectura
-const updateReading = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const userId = req.userId;
-    const { title, author, category, rating, status, review, isFavorite } = req.body;
-
-    const reading = await prisma.readingEntry.findUnique({
-      where: { id: parseInt(id) }
-    });
-
-    if (!reading) {
-      return res.status(404).json({ error: 'Lectura no encontrada' });
-    }
-
-    if (reading.userId !== userId) {
-      return res.status(403).json({ error: 'No tienes acceso a esta lectura' });
-    }
-
-    const updated = await prisma.readingEntry.update({
-      where: { id: parseInt(id) },
-      data: {
-        title: title || reading.title,
-        author: author || reading.author,
-        category: category || reading.category,
-        rating: rating ? parseInt(rating) : reading.rating,
-        status: status || reading.status,
-        review: review !== undefined ? review : reading.review,
-        isFavorite: isFavorite !== undefined ? isFavorite : reading.isFavorite,
-        finishedAt: status === 'completed' ? new Date() : reading.finishedAt
-      }
-    });
-
-    res.json({
-      message: 'Lectura actualizada',
-      entry: updated
-    });
-  } catch (error) {
-    console.error('Error en updateReading:', error);
-    next(error);
-  }
-};
 
 // DELETE: Eliminar lectura
 const deleteReading = async (req, res, next) => {
@@ -144,7 +163,7 @@ const deleteReading = async (req, res, next) => {
     const userId = req.userId;
 
     const reading = await prisma.readingEntry.findUnique({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     if (!reading) {
@@ -156,7 +175,7 @@ const deleteReading = async (req, res, next) => {
     }
 
     await prisma.readingEntry.delete({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     res.json({ message: 'Lectura eliminada' });
@@ -238,7 +257,7 @@ const getGame = async (req, res, next) => {
     const userId = req.userId;
 
     const game = await prisma.gameEntry.findUnique({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     if (!game) {
@@ -264,7 +283,7 @@ const updateGame = async (req, res, next) => {
     const { title, category, platform, rating, status, review, hoursPlayed, isFavorite } = req.body;
 
     const game = await prisma.gameEntry.findUnique({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     if (!game) {
@@ -276,7 +295,7 @@ const updateGame = async (req, res, next) => {
     }
 
     const updated = await prisma.gameEntry.update({
-      where: { id: parseInt(id) },
+      where: { id },
       data: {
         title: title || game.title,
         category: category || game.category,
@@ -307,7 +326,7 @@ const deleteGame = async (req, res, next) => {
     const userId = req.userId;
 
     const game = await prisma.gameEntry.findUnique({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     if (!game) {
@@ -319,7 +338,7 @@ const deleteGame = async (req, res, next) => {
     }
 
     await prisma.gameEntry.delete({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     res.json({ message: 'Juego eliminado' });
@@ -397,7 +416,7 @@ const getAnime = async (req, res, next) => {
     const userId = req.userId;
 
     const anime = await prisma.animeEntry.findUnique({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     if (!anime) {
@@ -423,7 +442,7 @@ const updateAnime = async (req, res, next) => {
     const { title, episodes, rating, status, review, isFavorite } = req.body;
 
     const anime = await prisma.animeEntry.findUnique({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     if (!anime) {
@@ -435,7 +454,7 @@ const updateAnime = async (req, res, next) => {
     }
 
     const updated = await prisma.animeEntry.update({
-      where: { id: parseInt(id) },
+      where: { id },
       data: {
         title: title || anime.title,
         episodes: episodes ? parseInt(episodes) : anime.episodes,
@@ -464,7 +483,7 @@ const deleteAnime = async (req, res, next) => {
     const userId = req.userId;
 
     const anime = await prisma.animeEntry.findUnique({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     if (!anime) {
@@ -476,7 +495,7 @@ const deleteAnime = async (req, res, next) => {
     }
 
     await prisma.animeEntry.delete({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     res.json({ message: 'Anime eliminado' });
@@ -552,6 +571,149 @@ const updateUserCollection = async (userId, type) => {
   }
 };
 
+
+
+// ===== UNIFIED ENTRY UPDATE =====
+const updateEntry = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+    let data = req.body;
+
+    // 1. Buscar en Reading
+    let entry = await prisma.readingEntry.findUnique({ where: { id } });
+    if (entry) {
+      if (entry.userId !== userId) return res.status(403).json({ error: "No autorizado" });
+
+      // Filtrar campos válidos para libros
+      const allowed = {
+        status: data.status,
+        review: data.review,
+        isFavorite: data.isFavorite,
+        currentPage: data.currentPage,
+      };
+
+      const updated = await prisma.readingEntry.update({
+        where: { id },
+        data: allowed
+      });
+
+      return res.json({ entry: updated });
+    }
+
+    // 2. Buscar en Game
+    entry = await prisma.gameEntry.findUnique({ where: { id } });
+    if (entry) {
+      if (entry.userId !== userId) return res.status(403).json({ error: "No autorizado" });
+
+      const allowed = {
+        status: data.status,
+        review: data.review,
+        isFavorite: data.isFavorite,
+        hoursPlayed: data.hoursPlayed,
+      };
+
+      const updated = await prisma.gameEntry.update({
+        where: { id },
+        data: allowed
+      });
+
+      return res.json({ entry: updated });
+    }
+
+    // 3. Buscar en Anime
+    entry = await prisma.animeEntry.findUnique({ where: { id } });
+    if (entry) {
+      if (entry.userId !== userId) return res.status(403).json({ error: "No autorizado" });
+
+      const allowed = {
+        status: data.status,
+        review: data.review,
+        isFavorite: data.isFavorite,
+        episodes: data.episodes,
+      };
+
+      const updated = await prisma.animeEntry.update({
+        where: { id },
+        data: allowed
+      });
+
+      return res.json({ entry: updated });
+    }
+
+    return res.status(404).json({ error: "Entrada no encontrada" });
+
+  } catch (error) {
+    console.error("Error en updateEntry:", error);
+    next(error);
+  }
+};
+
+
+
+// ===== UNIFIED GET ALL ENTRIES =====
+const getAllEntries = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+
+    const [readings, games, animes] = await Promise.all([
+      prisma.readingEntry.findMany({ where: { userId } }),
+      prisma.gameEntry.findMany({ where: { userId } }),
+      prisma.animeEntry.findMany({ where: { userId } }),
+    ]);
+
+    res.json({
+      readings,
+      games,
+      animes
+    });
+
+  } catch (error) {
+    console.error("Error en getAllEntries:", error);
+    next(error);
+  }
+};
+
+
+const estimatePages = (title, author) => {
+  const bookLengths = {
+    'harry potter': 300,
+    'el conde de montecristo': 460,
+    'cien años de soledad': 417,
+    'el hobbit': 310,
+    'don quijote': 863,
+    '1984': 328,
+    'orgullo y prejuicio': 279,
+    'el principito': 95,
+    'el señor de los anillos': 1000,
+    'dune': 688,
+  };
+
+  const lowerTitle = title.toLowerCase();
+  for (const [book, pages] of Object.entries(bookLengths)) {
+    if (lowerTitle.includes(book)) {
+      return pages;
+    }
+  }
+
+  // Estimación por defecto (promedio: 300 páginas)
+  return 300;
+};
+
+// Calcular días estimados para completar
+const estimateCompletionDays = (totalPages, currentPage) => {
+  if (!totalPages || totalPages === 0) return null;
+
+  const pagesRemaining = totalPages - (currentPage || 0);
+  const pagesPerDay = 30; // Promedio de páginas/día
+  const daysRemaining = Math.ceil(pagesRemaining / pagesPerDay);
+
+  return daysRemaining > 0 ? daysRemaining : 0;
+};
+
+
+
+
 export default {
   // Reading
   createReading,
@@ -570,5 +732,11 @@ export default {
   getMyAnimes,
   getAnime,
   updateAnime,
-  deleteAnime
+  deleteAnime,
+
+  //Todito
+  updateEntry,
+  getAllEntries,
+  estimateCompletionDays,
+  estimatePages
 };

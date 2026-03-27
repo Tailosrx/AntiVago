@@ -4,6 +4,7 @@ import useAuthStore from './store/authStore';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Library from './pages/Library/Library';
+import Logros from './pages/Logros/Logros';
 import Dashboard from './pages/Dashboard/Dashboard';
 
 export function App() {
@@ -23,6 +24,7 @@ export function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/library" element={isAuthenticated ? <Library /> : <Navigate to="/login" />} />
+        <Route path="/logros" element={isAuthenticated ? <Logros /> : <Navigate to="/login" />} />
         <Route
           path="/dashboard"
           element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
