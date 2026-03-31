@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -16,8 +16,10 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "ReadingEntry" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "photo" TEXT,
+    "type" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "author" TEXT,
     "category" TEXT NOT NULL,
@@ -25,6 +27,10 @@ CREATE TABLE "ReadingEntry" (
     "status" TEXT NOT NULL DEFAULT 'reading',
     "review" TEXT,
     "isFavorite" BOOLEAN NOT NULL DEFAULT false,
+    "totalPages" INTEGER,
+    "currentPage" INTEGER DEFAULT 0,
+    "progressPercentage" INTEGER NOT NULL DEFAULT 0,
+    "lastUpdatedPage" TIMESTAMP(3),
     "startedAt" TIMESTAMP(3),
     "finishedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -35,8 +41,9 @@ CREATE TABLE "ReadingEntry" (
 
 -- CreateTable
 CREATE TABLE "GameEntry" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "photo" TEXT,
     "title" TEXT NOT NULL,
     "category" TEXT NOT NULL,
     "platform" TEXT,
@@ -55,8 +62,9 @@ CREATE TABLE "GameEntry" (
 
 -- CreateTable
 CREATE TABLE "AnimeEntry" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "photo" TEXT,
     "title" TEXT NOT NULL,
     "episodes" INTEGER NOT NULL DEFAULT 0,
     "status" TEXT NOT NULL DEFAULT 'watching',
@@ -73,7 +81,7 @@ CREATE TABLE "AnimeEntry" (
 
 -- CreateTable
 CREATE TABLE "Achievement" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
     "type" TEXT NOT NULL,
@@ -90,9 +98,9 @@ CREATE TABLE "Achievement" (
 
 -- CreateTable
 CREATE TABLE "UserAchievement" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
-    "achievementId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "achievementId" TEXT NOT NULL,
     "progress" INTEGER NOT NULL DEFAULT 0,
     "unlockedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -102,8 +110,8 @@ CREATE TABLE "UserAchievement" (
 
 -- CreateTable
 CREATE TABLE "UserCollection" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "totalBooks" INTEGER NOT NULL DEFAULT 0,
     "totalGames" INTEGER NOT NULL DEFAULT 0,
     "totalAnime" INTEGER NOT NULL DEFAULT 0,
@@ -122,13 +130,28 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
+CREATE INDEX "User_email_idx" ON "User"("email");
+
+-- CreateIndex
+CREATE INDEX "User_username_idx" ON "User"("username");
+
+-- CreateIndex
 CREATE INDEX "ReadingEntry_userId_idx" ON "ReadingEntry"("userId");
+
+-- CreateIndex
+CREATE INDEX "ReadingEntry_category_idx" ON "ReadingEntry"("category");
 
 -- CreateIndex
 CREATE INDEX "GameEntry_userId_idx" ON "GameEntry"("userId");
 
 -- CreateIndex
+CREATE INDEX "GameEntry_category_idx" ON "GameEntry"("category");
+
+-- CreateIndex
 CREATE INDEX "AnimeEntry_userId_idx" ON "AnimeEntry"("userId");
+
+-- CreateIndex
+CREATE INDEX "Achievement_category_idx" ON "Achievement"("category");
 
 -- CreateIndex
 CREATE INDEX "UserAchievement_userId_idx" ON "UserAchievement"("userId");

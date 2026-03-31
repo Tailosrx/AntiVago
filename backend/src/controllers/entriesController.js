@@ -21,6 +21,7 @@ const createReading = async (req, res, next) => {
     const entry = await prisma.readingEntry.create({
       data: {
         userId,
+        type: 'libro',  // ✅ AGREGAR ESTO
         title,
         author,
         category,
@@ -30,13 +31,17 @@ const createReading = async (req, res, next) => {
         isFavorite: isFavorite || false,
         totalPages: estimatedPages,
         currentPage: currentPage || 0,
-        progressPercentage: estimatedPages ? Math.round((currentPage || 0 / estimatedPages) * 100) : 0,
+        progressPercentage: estimatedPages ? Math.round(((currentPage || 0) / estimatedPages) * 100) : 0,
         startedAt: new Date(),
         lastUpdatedPage: new Date()
       }
     });
 
     await updateUserCollection(userId, 'reading');
+
+    await verifyAndUnlockAchievements(userId);
+
+    
 
     res.status(201).json({
       message: 'Lectura creada',
@@ -91,6 +96,8 @@ const updateReading = async (req, res, next) => {
         lastUpdatedPage: currentPage !== undefined ? new Date() : reading.lastUpdatedPage
       }
     });
+
+    await verifyAndUnlockAchievements(userId);
 
     res.json({
       message: 'Lectura actualizada',
@@ -213,6 +220,7 @@ const createGame = async (req, res, next) => {
     });
 
     await updateUserCollection(userId, 'game');
+    await verifyAndUnlockAchievements(userId);
 
     res.status(201).json({
       message: 'Juego creado',
@@ -309,6 +317,8 @@ const updateGame = async (req, res, next) => {
       }
     });
 
+    await verifyAndUnlockAchievements(userId);
+
     res.json({
       message: 'Juego actualizado',
       entry: updated
@@ -374,6 +384,7 @@ const createAnime = async (req, res, next) => {
     });
 
     await updateUserCollection(userId, 'anime');
+    await verifyAndUnlockAchievements(userId);
 
     res.status(201).json({
       message: 'Anime creado',
@@ -465,6 +476,8 @@ const updateAnime = async (req, res, next) => {
         completedAt: status === 'completed' ? new Date() : anime.completedAt
       }
     });
+
+    await verifyAndUnlockAchievements(userId);
 
     res.json({
       message: 'Anime actualizado',
@@ -709,6 +722,62 @@ const estimateCompletionDays = (totalPages, currentPage) => {
   const daysRemaining = Math.ceil(pagesRemaining / pagesPerDay);
 
   return daysRemaining > 0 ? daysRemaining : 0;
+};
+
+// ✅ Helper para verificar logros
+const verifyAndUnlockAchievements = async (userId) => {
+  try {
+    const booksCompleted = await prisma.readingEntry.count({
+      where: { userId, status: 'completed' }
+    });
+
+    const gamesCompleted = await prisma.gameEntry.count({
+      where: { userId, status: 'completed' }
+    });
+
+    const animeCompleted = await prisma.animeEntry.count({
+      where: { userId, status: 'completed' }
+    });
+
+    const allAchievements = await prisma.achievement.findMany();
+
+    for (const achievement of allAchievements) {
+      let shouldUnlock = false;
+
+      if (achievement.requirementType === 'books_completed') {
+        shouldUnlock = booksCompleted >= achievement.requirementCount;
+      } else if (achievement.requirementType === 'games_completed') {
+        shouldUnlock = gamesCompleted >= achievement.requirementCount;
+      } else if (achievement.requirementType === 'anime_completed') {
+        shouldUnlock = animeCompleted >= achievement.requirementCount;
+      }
+
+      if (shouldUnlock) {
+        const exists = await prisma.userAchievement.findUnique({
+          where: {
+            userId_achievementId: { userId, achievementId: achievement.id }
+          }
+        });
+
+        if (!exists) {
+          await prisma.userAchievement.create({
+            data: {
+              userId,
+              achievementId: achievement.id,
+              unlockedAt: new Date()
+            }
+          });
+
+          await prisma.user.update({
+            where: { id: userId },
+            data: { points: { increment: achievement.points } }
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Error verificando logros:', err);
+  }
 };
 
 

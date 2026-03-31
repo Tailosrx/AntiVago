@@ -1,30 +1,33 @@
 import { useState } from "react";
+import api from "../../../services/api";
 import LibraryItem from "./LibraryItem";
 import ItemModal from "./ItemModal";
 
 
-export default function SectionBook({ readings, games, animes }) {
-  const allItems = [
-    ...readings.map((r) => ({ ...r, type: "libro" })),
-    ...games.map((g) => ({ ...g, type: "juego" })),
-    ...animes.map((a) => ({ ...a, type: "anime" })),
-  ];
+export default function SectionBook({ readings, games, animes, setReadings, setGames, setAnimes }) {
+  const allItems = type === "books" 
+    ? readings.map((r) => ({ ...r, type: "libro" }))
+    : type === "games"
+    ? games.map((g) => ({ ...g, type: "juego" }))
+    : animes.map((a) => ({ ...a, type: "anime" }));
 
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedItem, setSelectedItem] = useState(null);
-
   const [sortBy, setSortBy] = useState("recent");
 
-  const handleUpdateItem = (updatedItem) => {
+  const handleUpdate = async (updatedItem) => {
+    // Actualizar el item en el array
+    setReadings(readings.map(r => r.id === updatedItem.id ? updatedItem : r));
     setSelectedItem(null);
-
-    const updated = allItems.map((i) =>
-      i.id === updatedItem.id ? updatedItem : i
-    );
-
-
-    //mirar de mantener separados los tipos de ocio
-  }
+    
+    // Opcional: Recargar desde el servidor para sincronizar
+    try {
+      const res = await api.get('/entries/reading');
+      setReadings(res.data.readings || []);
+    } catch (err) {
+      console.error('Error reloading:', err);
+    }
+  };
 
   // 1. FILTRO
   const filteredItems = allItems.filter((item) => {
@@ -118,10 +121,12 @@ export default function SectionBook({ readings, games, animes }) {
           {/* MODAL */}
       {selectedItem && (
         <ItemModal 
-          item={selectedItem} 
-          onClose={() => setSelectedItem(null)} 
-          onUpdate={handleUpdateItem}
-        />
+        item={selectedItem} 
+        onClose={() => setSelectedItem(null)} 
+        onUpdate={handleUpdate}
+        setReadings={setReadings}
+        readings={readings}
+      />
       )}
       </div>
     </div>

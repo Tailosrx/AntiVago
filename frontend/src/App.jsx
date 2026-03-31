@@ -6,12 +6,13 @@ import Login from './pages/Login';
 import Library from './pages/Library/Library';
 import Logros from './pages/Logros/Logros';
 import Dashboard from './pages/Dashboard/Dashboard';
+import Register from './pages/Register';
 
 export function App() {
-  const { isAuthenticated, loading, fetchUser } = useAuthStore();
+  const { isAuthenticated, loading, initAuth } = useAuthStore();
 
   useEffect(() => {
-    fetchUser();
+    initAuth();
   }, []);
 
   if (loading) {
@@ -23,6 +24,7 @@ export function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />}  />
         <Route path="/library" element={isAuthenticated ? <Library /> : <Navigate to="/login" />} />
         <Route path="/logros" element={isAuthenticated ? <Logros /> : <Navigate to="/login" />} />
         <Route

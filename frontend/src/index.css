@@ -3,27 +3,68 @@
 @tailwind utilities;
 
 body {
-    margin: 0;
+  margin: 0;
 }
 
 a {
-    color: white;
-    text-decoration: none !important;
+  color: white;
+  text-decoration: none !important;
+}
+
+/* Modal estilo Steam */
+@keyframes steamModal {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
   }
-  
-  @keyframes steamModal {
-    from {
-      opacity: 0;
-      transform: translateY(10px) scale(0.97);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
-  
-  .animate-steamModal {
-    animation: steamModal 0.25s ease-out;
+}
+
+.animate-steamModal {
+  animation: steamModal 0.25s ease-out;
+}
+
+/* Apertura estilo iiSU */
+@keyframes openCollection {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.92);
+    filter: blur(4px);
   }
-  
-  
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1.02);
+    filter: blur(0px);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-open {
+  animation: openCollection 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Trofeos apareciendo desde abajo */
+@keyframes trophyPop {
+  0% {
+    opacity: 0;
+    transform: translateY(35px) scale(0.85);
+    filter: blur(3px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.05);
+    filter: blur(0px);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.trophy-anim {
+  animation: trophyPop 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

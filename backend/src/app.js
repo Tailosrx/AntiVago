@@ -7,6 +7,7 @@ import errorHandler from "./middleware/errorHandler.js";
 
 import authRoutes from "./routes/auth.js";
 import entriesRoutes from "./routes/entries.js";
+import achievementsRoutes from './routes/achievements.js';
 
 const app = express();
 
@@ -14,6 +15,7 @@ const app = express();
 app.use(cors({ origin: config.cors.origin }));
 app.use(morgan("dev"));
 app.use(json());
+
 
 // Health check
 app.get("/health", (req, res) => {
@@ -23,7 +25,7 @@ app.get("/health", (req, res) => {
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/entries", entriesRoutes);
-
+app.use('/api/achievements', achievementsRoutes);
 // 404
 app.use((req, res) => {
   res.status(404).json({ error: "Ruta no encontrada" });

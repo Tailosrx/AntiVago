@@ -34,31 +34,33 @@ model User {
 
 // ===== READING ENTRIES =====
 model ReadingEntry {
-  id        String  @id @default(uuid())
-  userId    String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  photo     String?
-  type      String
-
-  title     String
-  author    String?
-  category  String
-  rating    Int?    @db.SmallInt
-  status    String  @default("reading")
-  review    String?
-  isFavorite Boolean @default(false)
-
-  totalPages Int?
-  currentPage Int?
-  progressPercentage Int? @default(0)
-
-  startedAt DateTime?
-  finishedAt DateTime?
-  lastUpdatedPage DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String  @id @default(uuid())
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  photo       String?
+  type        String
+  title       String
+  author      String?
+  category    String
+  rating      Int?    @db.SmallInt
+  status      String  @default("reading")
+  review      String?
+  isFavorite  Boolean @default(false)
+  
+  totalPages  Int?
+  currentPage Int?    @default(0)              // NUEVO
+  progressPercentage Int @default(0)            // NUEVO
+  lastUpdatedPage DateTime?                     // NUEVO
+  
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([category])
 }
 
 
@@ -127,6 +129,7 @@ model Achievement {
   requirementType  String?
   requirementCount Int?
   rarityPercentage Float @default(50)
+  secret           Boolean @default(false)  
 
   userAchievements UserAchievement[]
 

@@ -59,7 +59,7 @@ const register = async (req, res, next) => {
     // Responder
     res.status(201).json({
       message: 'Usuario creado exitosamente',
-      accessToken,
+      token: accessToken,
       refreshToken,
       user: {
         id: user.id,
@@ -112,7 +112,7 @@ const login = async (req, res, next) => {
     // Responder
     res.json({
       message: 'Login exitoso',
-      accessToken,
+      token: accessToken,
       refreshToken,
       user: {
         id: user.id,

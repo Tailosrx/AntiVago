@@ -3,25 +3,19 @@ import { useAuth } from "../../hooks/useAuth";
 import api from "../../services/api";
 import Sidebar from "../Dashboard/components/Sidebar";
 import Header from "../Dashboard/components/Header";
-import AchievementCard from "./components/AchievementCard";
 import AchievementsSection from "./components/AchievementSection";
 
 export default function Logros() {
   const { user, logout } = useAuth();
-  const [readings, setReadings] = useState([]);
-  const [games, setGames] = useState([]);
-  const [animes, setAnimes] = useState([]);
+  const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const [readingsRes] = await Promise.all([api.get("/entries")]);
-
-        setReadings(readingsRes.data.readings || []);
-        setGames(readingsRes.data.games || []);
-        setAnimes(readingsRes.data.animes || []);
+        const achievementsRes = await api.get("/achievements/my");
+        setAchievements(achievementsRes.data || []);
       } catch (error) {
         console.error("Error loading data:", error);
       } finally {
@@ -47,10 +41,6 @@ export default function Logros() {
     );
   }
 
-
-
- 
-
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
       <Sidebar />
@@ -62,15 +52,8 @@ export default function Logros() {
           {/* 🏆 Título */}
           <h2 className="text-4xl font-bold mt-10 mb-6">Logros</h2>
 
-          {/* ⭐ Barra de progreso general */}
-          
-
           {/* 🧩 AQUÍ SOLO VA LA SECCIÓN COMPLETA */}
-          <AchievementsSection
-            readings={readings}
-            games={games}
-            animes={animes}
-          />
+          <AchievementsSection achievements={achievements} />
         </main>
       </div>
     </div>
