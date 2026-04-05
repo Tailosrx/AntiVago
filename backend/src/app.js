@@ -10,19 +10,24 @@ import entriesRoutes from "./routes/entries.js";
 import achievementsRoutes from './routes/achievements.js';
 
 const app = express();
-app.use(express.json({ limit: '10mb'}));
-app.use(express.urlencoded({ extended: true, limit: '10mb'}))
 
-// Middlewares
+// CORS — DEBE IR PRIMERO
 app.use(cors({
   origin: ["https://antivago.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
+// Opcional: permitir preflight OPTIONS
+app.options("*", cors());
+
+// Body parsers
+app.use(express.json({ limit: '10mb'}));
+app.use(express.urlencoded({ extended: true, limit: '10mb'}));
+
+// Middlewares
 app.use(morgan("dev"));
 app.use(json());
-
 
 // Health check
 app.get("/health", (req, res) => {
@@ -33,6 +38,7 @@ app.get("/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/entries", entriesRoutes);
 app.use('/api/achievements', achievementsRoutes);
+
 // 404
 app.use((req, res) => {
   res.status(404).json({ error: "Ruta no encontrada" });
