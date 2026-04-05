@@ -8,7 +8,7 @@ export const useEntries = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Obtener todas mis lecturas
+
   const fetchReadings = async () => {
     try {
       const response = await api.get('/entries/reading');
@@ -19,7 +19,7 @@ export const useEntries = () => {
     }
   };
 
-  // Obtener todos mis juegos
+
   const fetchGames = async () => {
     try {
       const response = await api.get('/entries/game');
@@ -29,7 +29,7 @@ export const useEntries = () => {
     }
   };
 
-  // Obtener todos mis animes
+
   const fetchAnimes = async () => {
     try {
       const response = await api.get('/entries/anime');
@@ -39,7 +39,7 @@ export const useEntries = () => {
     }
   };
 
-  // Crear lectura
+
   const createReading = async (data) => {
     try {
       const response = await api.post('/entries/reading', data);
@@ -51,7 +51,7 @@ export const useEntries = () => {
     }
   };
 
-  // Crear juego
+
   const createGame = async (data) => {
     try {
       const response = await api.post('/entries/game', data);
@@ -63,7 +63,7 @@ export const useEntries = () => {
     }
   };
 
-  // Crear anime
+
   const createAnime = async (data) => {
     try {
       const response = await api.post('/entries/anime', data);
@@ -75,7 +75,7 @@ export const useEntries = () => {
     }
   };
 
-  // Eliminar entry
+ 
   const deleteEntry = async (type, id) => {
     try {
       await api.delete(`/entries/${type}/${id}`);
@@ -93,7 +93,7 @@ export const useEntries = () => {
     }
   };
 
-  // Cargar datos UNA SOLA VEZ al montar
+ 
   useEffect(() => {
     const loadAllData = async () => {
       setLoading(true);
@@ -102,7 +102,7 @@ export const useEntries = () => {
     };
 
     loadAllData();
-  }, []); // Array vacío = solo se ejecuta una vez
+  }, []); 
 
   return {
     readings,

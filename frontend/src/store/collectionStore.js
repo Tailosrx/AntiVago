@@ -8,9 +8,9 @@ const useCollectionStore = create((set) => ({
   fetchCollection: async () => {
     try {
       set({ loading: true });
-      const response = await api.get('/entries/reading'); // Ajusta si tienes endpoint específico
+      const response = await api.get('/entries/reading'); 
       
-      // Calcular totales (temporal hasta tener endpoint)
+    
       const collection = {
         totalBooks: response.data.count || 0,
         totalGames: 0,

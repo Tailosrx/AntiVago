@@ -4,8 +4,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
       <div className="text-center">
-        <h1 className="text-6xl font-bold text-white mb-4">ReadPlay</h1>
-        <p className="text-xl text-white/80 mb-8">Lee, juega, colecciona, gana logros</p>
+        <h1 className="text-6xl font-bold text-white mb-4"></h1>
+        <img className="w-52 justify-center mx-auto"  src="/antivago2.png" alt="Logo de AntiVago" />
+        <p className="text-xl text-white/80 mb-8">Domina tu tiempo libre</p>
         <div className="flex gap-4 justify-center">
           <Link to="/login" className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100">
             Login

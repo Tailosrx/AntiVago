@@ -10,9 +10,10 @@ export default function CreateReadingModal({ onSubmit, onClose }) {
     rating: '',
     status: 'reading',
     review: '',
-    isFavorite: false
+    photo: null  // ✅ AGREGAR
   });
   const [loading, setLoading] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState(null);  // ✅ AGREGAR
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -22,22 +23,38 @@ export default function CreateReadingModal({ onSubmit, onClose }) {
     });
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, photo: reader.result }); // ✅ base64
+        setPhotoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+  
+    // ✅ JSON normal, sin FormData
     const result = await onSubmit({
       ...formData,
       totalPages: formData.totalPages ? parseInt(formData.totalPages) : null,
       currentPage: parseInt(formData.currentPage) || 0,
       rating: formData.rating ? parseInt(formData.rating) : null
     });
-    
+  
     setLoading(false);
     if (result.success) {
       onClose();
     }
   };
+
+ 
+  
 
   const progress = formData.totalPages ? 
     Math.round((formData.currentPage / formData.totalPages) * 100) : 0;
@@ -62,6 +79,39 @@ export default function CreateReadingModal({ onSubmit, onClose }) {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           
+          {/* ✅ UPLOAD FOTO */}
+          <div>
+            <label className="block text-sm font-bold text-purple-300 mb-2">
+              Portada (Opcional)
+            </label>
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoChange}
+                className="hidden"
+                id="photo-input"
+              />
+              <label
+                htmlFor="photo-input"
+                className="flex items-center justify-center w-full px-4 py-8 border-2 border-dashed border-purple-500/30 rounded-lg cursor-pointer hover:border-purple-500/50 transition-all"
+              >
+                {photoPreview ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <img src={photoPreview} alt="Preview" className="h-24 rounded" />
+                    <p className="text-sm text-purple-300">Click para cambiar imagen</p>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <p className="text-2xl mb-2">📸</p>
+                    <p className="text-purple-300">Haz click para subir imagen</p>
+                    <p className="text-xs text-purple-400 mt-1">PNG, JPG (máx. 5MB)</p>
+                  </div>
+                )}
+              </label>
+            </div>
+          </div>
+
           {/* Título */}
           <div>
             <label className="block text-sm font-bold text-purple-300 mb-2">
@@ -211,19 +261,7 @@ export default function CreateReadingModal({ onSubmit, onClose }) {
             />
           </div>
 
-          {/* Favorito */}
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="isFavorite"
-              checked={formData.isFavorite}
-              onChange={handleChange}
-              className="w-4 h-4 cursor-pointer"
-            />
-            <label className="text-sm font-bold text-purple-300 cursor-pointer">
-              Marcar como favorito ❤️
-            </label>
-          </div>
+
 
           {/* Botones */}
           <div className="flex gap-3 pt-6 border-t border-purple-500/20">

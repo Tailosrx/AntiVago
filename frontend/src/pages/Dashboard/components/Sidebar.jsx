@@ -1,85 +1,64 @@
-import dashboardIcon from "../../../assets/dashboard.svg";
-import libraryIcon from "../../../assets/library.svg";
-import logrosIcon from "../../../assets/logros.svg";
 import { Link, useLocation } from "react-router-dom";
 
 export default function Sidebar() {
   const { pathname } = useLocation();
 
+  const links = [
+    { to: "/dashboard", icon: "dashboard", label: "Dashboard" },
+    { to: "/library", icon: "book", label: "Librería" },
+    { to: "/logros", icon: "license", label: "Logros" },
+  ];
+
   return (
-    <aside className="relative w-64 flex-shrink-0 bg-slate-900/40 border-r border-primary/20 backdrop-blur-xl flex flex-col p-6">
-      {/* LOGO + TITLE */}
-      <div className="flex items-center gap-3 mb-10">
-        <div className=" ml-6 flex items-center justify-center">
-          <img src="/antivago2.png" className="w-26 h-26 " />
-        </div>
+    <aside
+      style={{
+        fontFamily: "'Nunito', sans-serif",
+        background: 'rgba(255,255,255,0.7)',
+        borderRight: '2px solid #e0e0e8',
+        boxShadow: '2px 0 0 #d0d0da',
+      }}
+      className="relative w-20 flex-shrink-0 flex flex-col items-center py-6 gap-4"
+    >
+      {/* Logo */}
+      <div className="w-12 h-12 bg-white border-2 border-[#ddd] shadow-[0_2px_0_#ccc] rounded-2xl flex items-center justify-center overflow-hidden mb-2">
+        <img src="/antivago2.png" className="w-8 h-8 object-contain" />
       </div>
 
-      {/* NAVIGATION */}
-      <nav className="flex-1 flex flex-col gap-2">
-        {/* DASHBOARD */}
+      {/* Divider */}
+      <div className="w-8 h-0.5 bg-[#e0e0e8] rounded-full" />
 
-        <Link to="/dashboard">
-          <div
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all
-            ${
-              pathname === "/dashboard"
-                ? "bg-primary text-white"
-                : "hover:bg-primary/10 text-slate-400 hover:text-white"
-            }`}
-          >
-            <span className="material-symbols-outlined">dashboard</span>
-            <span className="font-medium">Dashboard</span>
-          </div>
-        </Link>
-
-        <Link to="/library">
-          <div
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all
-    ${
-      pathname === "/library"
-        ? "bg-primary text-white"
-        : "hover:bg-primary/10 text-slate-400 hover:text-white"
-    }
-  `}
-          >
-            <span className="material-symbols-outlined">book</span>
-            <span className="font-medium">Librería</span>
-          </div>
-        </Link>
-
-        <Link to="/logros">
-          <div
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all
-    ${
-      pathname === "/logros"
-        ? "bg-primary text-white"
-        : "hover:bg-primary/10 text-slate-400 hover:text-white"
-    }
-  `}
-          >
-            <span className="material-symbols-outlined">license</span>
-            <span className="font-medium">Logros</span>
-          </div>
-        </Link>
+      {/* Nav */}
+      <nav className="flex flex-col items-center gap-3 flex-1">
+        {links.map(({ to, icon, label }) => {
+          const active = pathname === to;
+          return (
+            <Link key={to} to={to} title={label} className="flex flex-col items-center gap-1">
+              <div className={`
+                w-12 h-12 rounded-2xl flex items-center justify-center
+                border-2 transition-all duration-150
+                ${active
+                  ? "bg-[#222] border-[#111] shadow-[0_2px_0_#000] text-white"
+                  : "bg-white border-[#ddd] shadow-[0_2px_0_#ccc] text-[#888] hover:bg-[#f4f4f8] hover:text-[#333]"
+                }
+              `}>
+                <span className="material-symbols-outlined text-[22px]">{icon}</span>
+              </div>
+              <p className={`text-[10px] font-black text-center
+                ${active ? "text-[#222]" : "text-[#bbb]"}
+              `}>
+                {label}
+              </p>
+            </Link>
+          );
+        })}
       </nav>
 
-      {/* USER */}
-      <div className="mt-auto pt-6 border-t border-slate-800">
-        <div className="flex items-center gap-3 p-2">
-           <div className="size-10 rounded-full bg-slate-800 border-2 border-primary overflow-hidden">
-            <img
-              className="w-full h-full object-cover"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAi7P0i-ve1JfNTxcIb8UMyw2NSPHK43UL04dxVnshxY_VhYiuaazzGQj2EqTAbqqIdYMhsqF0ZDH5kmw0Jk8rSFS_0pUoKXzgAkd6-737QzpV2xsyjZ1vnscX6y0gcHohNMsfLUCibYNLxzFTE4Sz0T3fIJ3m61tGFfDUJiS9j0Kdo0yBOcF0PVKElyJGZgqyfWZCW9Hxsb_dDD8MvUVpGI8LJZ2u3n18GLlb-698yTx9xvJan4weVh6E6RYX2f99_uQAxogNUkG0"
-              alt="User avatar"
-            />
-          </div> 
+      {/* Divider */}
+      <div className="w-8 h-0.5 bg-[#e0e0e8] rounded-full" />
 
-          <div className="flex flex-col">
-            <span className="text-sm font-bold">Tai</span>
-            <span className="text-xs text-primary font-medium">Lvl 1 Vago</span> 
-          </div>
-        </div>    
+      {/* Settings */}
+      <div className="w-12 h-12 bg-white border-2 border-[#ddd] shadow-[0_2px_0_#ccc] rounded-2xl flex items-center justify-center text-[#aaa] hover:text-[#333] hover:bg-[#f4f4f8] transition-all cursor-pointer">
+        <span className="material-symbols-outlined text-[22px]">settings</span>
       </div>
     </aside>
   );

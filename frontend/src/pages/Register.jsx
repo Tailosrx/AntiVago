@@ -46,7 +46,7 @@ export default function Register() {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
 
-      // Redirigir al dashboard
+W
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Error en el registro');
@@ -56,22 +56,12 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex items-center justify-center p-4">
-      {/* Background Blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600 rounded-full mix-blend-screen filter blur-3xl opacity-10"></div>
-        <div className="absolute top-1/2 right-1/4 w-96 h-96 bg-pink-600 rounded-full mix-blend-screen filter blur-3xl opacity-10"></div>
-      </div>
-
-      {/* Card */}
-      <div className="relative z-10 w-full max-w-md">
-        <div className="bg-slate-900/50 border border-purple-500/20 rounded-2xl p-8 backdrop-blur-xl">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
-              ReadPlay
-            </h1>
-            <p className="text-purple-300">Crea tu cuenta</p>
+            <img src="/antivago2.png" alt="Logo" className='mx-auto mb-5' />
+            <h2 className="text-3xl font-bold mb-6 text-gray-800">Crea tu Cuenta</h2>
           </div>
 
           {/* Error */}
@@ -83,6 +73,7 @@ export default function Register() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+
             <div>
               <label className="block text-sm font-bold text-purple-300 mb-2">
                 Email
@@ -93,7 +84,7 @@ export default function Register() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="tu@email.com"
-                className="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-purple-400/50 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                className="w-full p-2 border rounded"                
                 required
               />
             </div>
@@ -108,8 +99,7 @@ export default function Register() {
                 value={formData.username}
                 onChange={handleChange}
                 placeholder="tuusuario"
-                className="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-purple-400/50 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
-                required
+                className="w-full p-2 border rounded"                  required
               />
             </div>
 
@@ -123,8 +113,7 @@ export default function Register() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-purple-400/50 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
-                required
+                className="w-full p-2 border rounded"                  required
               />
             </div>
 
@@ -138,15 +127,14 @@ export default function Register() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-purple-400/50 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
-                required
+                className="w-full p-2 border rounded"                  required
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg font-black text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:shadow-purple-600/50 disabled:opacity-50 transition-all mt-6"
+              className="w-full bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700"
             >
               {loading ? '⏳ Registrando...' : '✨ Crear Cuenta'}
             </button>
@@ -161,6 +149,5 @@ export default function Register() {
           </p>
         </div>
       </div>
-    </div>
   );
 }

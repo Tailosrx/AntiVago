@@ -28,32 +28,29 @@ export default function Logros() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
+      <div className="flex items-center justify-center h-screen bg-[#ebebef]">
         <div className="text-center">
-          <div className="animate-spin mb-4">
-            <div className="h-16 w-16 border-4 border-purple-500 border-t-pink-500 rounded-full"></div>
+          <div className="animate-spin mb-4 mx-auto">
+            <div className="h-14 w-14 border-4 border-[#555] border-t-transparent rounded-full"></div>
           </div>
-          <p className="text-white text-lg font-semibold">
-            Cargando tus logros...
-          </p>
+          <p className="text-[#555] text-base font-extrabold">Cargando logros...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+    <div className="pattern text-[#222] min-h-screen flex" style={{ fontFamily: "'Nunito', sans-serif" }}>
       <Sidebar />
 
       <div className="flex flex-col flex-1">
         <Header />
 
-        <main className="flex-1 px-0 py-0 lg:px-20">
-          {/* 🏆 Título */}
-          <h2 className="text-4xl font-bold mt-10 mb-6">Logros</h2>
-
-          {/* 🧩 AQUÍ SOLO VA LA SECCIÓN COMPLETA */}
-          <AchievementsSection achievements={achievements} />
+        <main className="flex-1 px-6 py-6 lg:px-16">
+          <div className="bg-[#f5f5f8] rounded-2xl p-6 shadow-inner">
+            <h2 className="text-3xl font-black text-[#222] mb-2">Logros</h2>
+            <AchievementsSection achievements={achievements} />
+          </div>
         </main>
       </div>
     </div>

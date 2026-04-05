@@ -5,9 +5,9 @@ const useAuthStore = create((set) => ({
   user: null,
   token: null,
   isAuthenticated: false,
-  loading: true,  // ✅ AGREGAR ESTO
+  loading: true, 
 
-  // Al iniciar, verificar si hay token en localStorage
+  // verifica token -- localStorage
   initAuth: () => {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
@@ -16,10 +16,10 @@ const useAuthStore = create((set) => ({
         token,
         user: JSON.parse(user),
         isAuthenticated: true,
-        loading: false  // ✅ ACTUALIZAR AQUÍ
+        loading: false 
       });
     } else {
-      set({ loading: false });  // ✅ AUNQUE NO HAYA TOKEN
+      set({ loading: false }); 
     }
   },
 
@@ -72,7 +72,7 @@ const useAuthStore = create((set) => ({
   }
 }));
 
-// Inicializar auth al cargar
+//  auth cargado
 useAuthStore.getState().initAuth();
 
 export default useAuthStore;

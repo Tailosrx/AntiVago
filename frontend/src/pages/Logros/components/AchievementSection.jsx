@@ -4,26 +4,26 @@ import AchievementCard from "./AchievementCard";
 
 export default function AchievementsSection({ achievements }) {
   const [activeCollection, setActiveCollection] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedCard, setSelectedCard] = useState(null);
 
   // Agrupar logros por categoría
   const collections = [
     {
       id: "reading",
-      title: "Lector Ávido",
-      icon: "📚",
-      achievements: achievements.filter(a => a.category === 'Lector Ávido')
+      title: "Rata de Biblioteca",
+      icon: "/book.png",
+      achievements: achievements.filter(a => a.category === 'Rata de Biblioteca')
     },
     {
       id: "gaming",
       title: "Gamer Pro",
-      icon: "🎮",
+      icon: "/game.png",
       achievements: achievements.filter(a => a.category === 'Gamer Pro')
     },
     {
       id: "anime",
       title: "Otaku Certificado",
-      icon: "🎬",
+      icon: "/anime.png",
       achievements: achievements.filter(a => a.category === 'Otaku Certificado')
     }
   ].filter(c => c.achievements.length > 0); // Solo mostrar colecciones con logros
@@ -35,57 +35,38 @@ export default function AchievementsSection({ achievements }) {
   // Vista 1: Carrusel
   if (!activeCollection) {
     return (
-      <div className="mt-10">
-        <h2 className="text-3xl font-bold mb-6 text-center">Colecciones</h2>
-
-        <div className="relative w-full max-w-4xl mx-auto">
-          {/* Botón izquierda */}
-          <button
-            onClick={prev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 text-5xl text-white/40 hover:text-white transition px-4 z-20"
-          >
-            ‹
-          </button>
-
-          {/* Ventana del carrusel */}
-          <div className="overflow-hidden w-full rounded-3xl">
-            <div
-              className="flex transition-transform duration-500"
-              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-            >
-              {collections.map((c) => {
-                const unlocked = c.achievements.filter(
-                  (a) => a.unlocked
-                ).length;
-                const total = c.achievements.length;
-
-                return (
-                  <div
-                    key={c.id}
-                    className="w-full flex-shrink-0 flex justify-center"
-                  >
-                    <CollectionCard
-                      title={c.title}
-                      icon={c.icon}
-                      unlocked={unlocked}
-                      total={total}
-                      onClick={() => setActiveCollection(c.id)}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Botón derecha */}
-          <button
-            onClick={next}
-            className="absolute right-0 top-1/2 -translate-y-1/2 text-5xl text-white/40 hover:text-white transition px-4 z-20"
-          >
-            ›
-          </button>
+      <div className="mt-6">
+        <div className="flex items-center gap-3 mb-6">
+        <div className="bg-white border-2 border-[#ddd] rounded-full px-4 py-1.5 text-[15px] font-black text-[#333] shadow-[0_2px_0_#ccc] flex items-center gap-2">
+          <img src="/oro.webp" className="w-6" /> {achievements.filter(a => a.unlocked).length} logros
         </div>
+        <span className="text-[13px] font-bold text-[#aaa]">
+          de {achievements.length} totales
+        </span>
       </div>
+
+      
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {collections.map(c => {
+          const unlocked = c.achievements.filter(a => a.unlocked).length;
+          const total = c.achievements.length;
+          return (
+            <CollectionCard
+              key={c.id}
+              title={c.title}
+              icon={c.icon}
+              unlocked={unlocked}
+              total={total}
+              selected={selectedCard === c.id}
+              onClick={() => {
+                setSelectedCard(c.id);
+                setTimeout(() => setActiveCollection(c.id), 150);
+              }}
+            />
+          );
+        })}
+      </div>
+    </div>
     );
   }
 
@@ -93,27 +74,37 @@ export default function AchievementsSection({ achievements }) {
   const selected = collections.find((c) => c.id === activeCollection);
 
   return (
-    <div className="mt-10 animate-open">
+    <div className="animate-open">
       <button
         onClick={() => setActiveCollection(null)}
         className="
-    mb-6 flex items-center gap-2 px-4 py-2
-    text-sm font-medium
-    text-white/80 hover:text-white
-    bg-white/5 hover:bg-white/10
-    border border-white/10 hover:border-white/20
-    rounded-xl backdrop-blur-md
-    transition-all duration-300
-    hover:scale-[1.03] hover:shadow-lg
-  "
+            mb-6 flex items-center gap-2 px-4 py-2
+            bg-white border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da]
+            rounded-xl font-extrabold text-sm text-[#555]
+            hover:bg-[#f8f8fc] transition-all
+          "
       >
         <span className="material-symbols-rounded text-xl">arrow_back</span>
         Volver
       </button>
 
-      <h2 className="text-3xl font-bold mb-6">{selected.title}</h2>
+      <div className="flex items-center gap-3 mb-6">
+          <div className={`
+            w-11 h-11 rounded-xl flex items-center justify-center
+            ${selected.id === 'gaming' ? 'bg-[#d0e8ff]'
+              : selected.id === 'reading' ? 'bg-[#fff0d0]'
+              : selected.id === 'anime' ? 'bg-[#ffd0e8]'
+              : 'bg-[#d0ffd8]'}
+          `}>
+            <img src={selected.icon} className="w-7 h-7 object-contain" />
+          </div>
+          <h2 className="text-2xl font-black text-[#222]">{selected.title}</h2>
+          <span className="bg-[#e8e8f0] rounded-md px-2 py-0.5 text-[11px] font-extrabold text-[#777]">
+            {selected.achievements.filter(a => a.unlocked).length}/{selected.achievements.length}
+          </span>
+        </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-6 py-10">
+      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-4 py-10">
         {selected.achievements.map((a, index) => (
           <div
             key={a.id}
@@ -126,7 +117,7 @@ export default function AchievementsSection({ achievements }) {
               iconSrc={a.iconUrl}
               unlocked={a.unlocked}
               rarity="bronze"
-              secret={false}
+              secret={a.secret ?? false}
             />
           </div>
         ))}

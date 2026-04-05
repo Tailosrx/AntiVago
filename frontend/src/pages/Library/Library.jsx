@@ -5,18 +5,18 @@ import Sidebar from "../Dashboard/components/Sidebar";
 import SectionBook from "./components/SectionBook";
 import Header from "../Dashboard/components/Header";
 import CreateReadingModal from "./components/CreateReadingModal";
-import CreateAnimeModal from "./components/CreateAnimeModal"; 
-import CreateGameModal from "./components/CreateGameModal"; 
+import CreateAnimeModal from "./components/CreateAnimeModal";
+import CreateGameModal from "./components/CreateGameModal";
 
 export default function Library() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [readings, setReadings] = useState([]);
   const [games, setGames] = useState([]);
   const [animes, setAnimes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("books");
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState(null); 
+  const [modalType, setModalType] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -27,7 +27,6 @@ export default function Library() {
           api.get("/entries/game"),
           api.get("/entries/anime"),
         ]);
-
         setReadings(readingsRes.data.readings || []);
         setGames(gamesRes.data.games || []);
         setAnimes(animesRes.data.animes || []);
@@ -37,7 +36,6 @@ export default function Library() {
         setLoading(false);
       }
     };
-
     loadData();
   }, []);
 
@@ -52,7 +50,7 @@ export default function Library() {
     }
   };
 
-  const handleAddGame = async (data) => {  // ✅ AGREGAR
+  const handleAddGame = async (data) => {
     try {
       const response = await api.post("/entries/game", data);
       setGames([response.data.entry, ...games]);
@@ -63,7 +61,7 @@ export default function Library() {
     }
   };
 
-  const handleAddAnime = async (data) => {  // ✅ AGREGAR
+  const handleAddAnime = async (data) => {
     try {
       const response = await api.post("/entries/anime", data);
       setAnimes([response.data.entry, ...animes]);
@@ -74,147 +72,115 @@ export default function Library() {
     }
   };
 
-  const total = readings.length + (games?.length || 0) + (animes?.length || 0);
+  const handleDeleteBook = async (id) => {
+    try {
+      await api.delete(`/entries/reading/${id}`);
+      setReadings(readings.filter(r => r.id !== id));
+      setShowModal(false);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.response?.data?.error };
+    }
+  };
+
+  const tabs = [
+    { id: "books",  label: " Libros",  color: "#f59e0b" },
+    { id: "games",  label: " Juegos",  color: "#5b9cf6" },
+    { id: "animes", label: " Animes",  color: "#f472b6" },
+  ];
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
-        <div className="text-center">
-          <div className="animate-spin mb-4">
-            <div className="h-16 w-16 border-4 border-purple-500 border-t-pink-500 rounded-full"></div>
+      <div
+        className="flex items-center justify-center h-screen"
+        style={{
+          backgroundColor: '#ececec',
+          backgroundImage: 'radial-gradient(circle, #c0c0c0 1px, transparent 1px)',
+          backgroundSize: '18px 18px',
+          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%)',
+          maskImage: 'linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%)',
+        }}
+      >
+        <div className="text-center" style={{ fontFamily: "'Nunito', sans-serif" }}>
+          <div className="animate-spin mb-4 mx-auto">
+            <div className="h-14 w-14 border-4 border-[#555] border-t-transparent rounded-full"></div>
           </div>
-          <p className="text-white text-lg font-semibold">
-            Cargando tu librería...
-          </p>
+          <p className="text-[#555] text-base font-extrabold">Cargando tu librería...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#1B1022] text-white font-['Space_Grotesk'] flex min-h-screen w-full overflow-hidden">
-  
-      {/* SIDEBAR */}
+    <div
+      className="pattern text-[#222] flex min-h-screen w-full overflow-hidden"
+      style={{
+        fontFamily: "'Nunito', sans-serif",
+      }}
+    >
       <Sidebar />
-  
-      {/* RIGHT SIDE */}
+
       <div className="flex flex-col flex-1 overflow-y-auto">
-  
         <Header />
-  
-        <main className="flex-1 p-8 lg:px-20">
-          {/* Tabs */}
-          <div className="mb-8 flex justify-between items-center">
-            <div className="flex gap-4">
+
+        <main className="flex-1 px-6 py-6 lg:px-12">
+          <div className="bg-[#f5f5f8] rounded-2xl p-6">
+
+            {/* Tabs + botón */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex gap-2 bg-white border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da] rounded-2xl p-1.5">
+                {tabs.map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`
+                      px-5 py-2 rounded-xl text-[14px] font-black transition-all duration-150
+                      ${activeTab === tab.id
+                        ? "bg-[#222] text-white shadow-[0_2px_0_#000]"
+                        : "text-[#999] hover:text-[#444] hover:bg-[#f4f4f8]"
+                      }
+                    `}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
               <button
-                onClick={() => setActiveTab("books")}
-                className={`text-2xl font-black pb-2 transition-all ${
-                  activeTab === "books"
-                    ? "text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text border-b-2 border-purple-400"
-                    : "text-purple-300 hover:text-white"
-                }`}
+                onClick={() => { setModalType(activeTab); setShowModal(true); }}
+                className="bg-white border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da] rounded-2xl px-5 py-2.5 text-[14px] font-black text-[#333] hover:bg-[#f4f4f8] hover:-translate-y-0.5 hover:shadow-[0_4px_0_#c8c8d4] transition-all duration-150"
               >
-                📚 Libros
-              </button>
-              <button
-                onClick={() => setActiveTab("games")}
-                className={`text-2xl font-black pb-2 transition-all ${
-                  activeTab === "games"
-                    ? "text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text border-b-2 border-purple-400"
-                    : "text-purple-300 hover:text-white"
-                }`}
-              >
-                🎮 Juegos
-              </button>
-              <button
-                onClick={() => setActiveTab("animes")}
-                className={`text-2xl font-black pb-2 transition-all ${
-                  activeTab === "animes"
-                    ? "text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text border-b-2 border-purple-400"
-                    : "text-purple-300 hover:text-white"
-                }`}
-              >
-                🎬 Animes
+                {activeTab === "books"  && " Agregar Libro"}
+                {activeTab === "games"  && " Agregar Juego"}
+                {activeTab === "animes" && " Agregar Anime"}
               </button>
             </div>
 
-            {/* Botón dinámico según tab */}
-            <button
-              onClick={() => {
-                setModalType(activeTab);
-                setShowModal(true);
-              }}
-              className="px-6 py-3 rounded-lg font-black text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:shadow-purple-600/50 hover:scale-105 transition-all duration-300"
-            >
-              {activeTab === "books" && "✨ Agregar Libro"}
-              {activeTab === "games" && "✨ Agregar Juego"}
-              {activeTab === "animes" && "✨ Agregar Anime"}
-            </button>
+            {/* Modales */}
+            {showModal && modalType === "books" && (
+              <CreateReadingModal onSubmit={handleAddBook} onDelete={handleDeleteBook} onClose={() => setShowModal(false)} />
+            )}
+            {showModal && modalType === "games" && (
+              <CreateGameModal onSubmit={handleAddGame} onClose={() => setShowModal(false)} />
+            )}
+            {showModal && modalType === "animes" && (
+              <CreateAnimeModal onSubmit={handleAddAnime} onClose={() => setShowModal(false)} />
+            )}
+
+            {/* Contenido */}
+            {activeTab === "books" && (
+              <SectionBook readings={readings} games={games} animes={animes} setReadings={setReadings} setGames={setGames} setAnimes={setAnimes} type="books" />
+            )}
+            {activeTab === "games" && (
+              <SectionBook readings={readings} games={games} animes={animes} setReadings={setReadings} setGames={setGames} setAnimes={setAnimes} type="games" />
+            )}
+            {activeTab === "animes" && (
+              <SectionBook readings={readings} games={games} animes={animes} setReadings={setReadings} setGames={setGames} setAnimes={setAnimes} type="animes" />
+            )}
+
           </div>
-
-          {/* Modales */}
-          {showModal && modalType === "books" && (
-            <CreateReadingModal
-              onSubmit={handleAddBook}
-              onClose={() => setShowModal(false)}
-            />
-          )}
-          {showModal && modalType === "games" && (
-            <CreateGameModal
-              onSubmit={handleAddGame}
-              onClose={() => setShowModal(false)}
-            />
-          )}
-          {showModal && modalType === "animes" && (
-            <CreateAnimeModal
-              onSubmit={handleAddAnime}
-              onClose={() => setShowModal(false)}
-            />
-          )}
-
-          {/* Sección dinámica según tab */}
-          {activeTab === "books" && (
-            <SectionBook 
-              readings={readings}
-              games={games}
-              animes={animes}
-              setReadings={setReadings}
-              setGames={setGames}
-              setAnimes={setAnimes}
-              type="books"
-            />
-          )}
-
-          {activeTab === "games" && (
-            <SectionBook 
-              readings={readings}
-              games={games}
-              animes={animes}
-              setReadings={setReadings}
-              setGames={setGames}
-              setAnimes={setAnimes}
-              type="games"
-            />
-          )}
-
-          {activeTab === "animes" && (
-            <SectionBook 
-              readings={readings}
-              games={games}
-              animes={animes}
-              setReadings={setReadings}
-              setGames={setGames}
-              setAnimes={setAnimes}
-              type="animes"
-            />
-          )}
-          
         </main>
-  
-  
       </div>
-
-      {/* Modal */}
     </div>
   );
 }

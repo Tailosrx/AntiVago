@@ -1,179 +1,190 @@
 import { useState } from "react";
-import api from "../../../services/api"
+import api from "../../../services/api";
 
-export default function ItemModal({ item, onClose, onUpdate, setReadings, readings }) {
-    const [status, setStatus] = useState(item.status);
-    const [progress, setProgress] = useState(item.currentPage || item.hoursPlayed || item.episodes || 0);
-    const [review, setReview] = useState(item.review || "");
-    const [isFavorite, setIsFavorite] = useState(item.isFavorite);
-    const [loading, setLoading] = useState(false);
+export default function ItemModal({ item, onClose, onUpdate }) {
+  const [status, setStatus] = useState(item.status);
+  const [progress, setProgress] = useState(
+    item.currentPage || item.hoursPlayed || item.episodes || 0
+  );
+  const [review, setReview] = useState(item.review || "");
+  const [loading, setLoading] = useState(false);
 
-    const handleSave = async () => {
-      try {
-        setLoading(true);
-        let payload = {
-          status,
-          review,
-          isFavorite,
-        };
-    
-        if (item.type === "libro") {
-          payload.currentPage = parseInt(progress);
-        } else if (item.type === "juego") {
-          payload.hoursPlayed = parseInt(progress);
-        } else if (item.type === "anime") {
-          payload.episodes = parseInt(progress);
-        }
-    
-        const res = await api.put(`/entries/${item.id}`, payload);
-        
-        // ✅ Actualizar en el array local
-        if (setReadings && readings) {
-          setReadings(readings.map(r => r.id === item.id ? res.data.entry : r));
-        }
-        
-        onUpdate(res.data.entry);
-        onClose();
-      } catch (err) {
-        console.error("Error guardando cambios:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    // Calcular progreso para libros
-    const progressPercentage = item.totalPages 
-      ? Math.round((progress / item.totalPages) * 100) 
-      : 0;
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      const payload = { status, review };
+      if (item.type === "libro")  payload.currentPage  = parseInt(progress);
+      if (item.type === "juego")  payload.hoursPlayed  = parseInt(progress);
+      if (item.type === "anime")  payload.episodes      = parseInt(progress);
 
-    return (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="bg-[#1a1d23] text-white w-[850px] rounded-xl shadow-2xl overflow-hidden">
-  
-          {/* HEADER */}
-          <div className="flex justify-between items-center p-5 border-b border-white/10">
-            <h2 className="text-2xl font-bold tracking-wide">{item.title}</h2>
-            <button onClick={onClose} className="text-white/60 hover:text-white text-3xl">
-              ×
-            </button>
-          </div>
-  
-          {/* BODY */}
-          <div className="flex p-6 gap-6">
-  
-            {/* COVER */}
-            <div className="w-60 h-80 rounded-lg bg-cover bg-center shadow-lg bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center"
-              style={{ backgroundImage: item.photo ? `url(${item.photo})` : 'none' }}
+      const res = await api.put(`/entries/${item.id}`, payload);
+      onUpdate(res.data.entry);
+      onClose();
+    } catch (err) {
+      console.error("Error guardando cambios:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const progressPercentage = item.totalPages
+    ? Math.round((progress / item.totalPages) * 100)
+    : 0;
+
+  const typeConfig = {
+    libro: { color: "#f59e0b", label: "Libro" },
+    juego: { color: "#5b9cf6", label: "Juego" },
+    anime: { color: "#f472b6", label: "Anime" },
+  };
+  const config = typeConfig[item.type] || typeConfig.libro;
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      style={{ fontFamily: "'Nunito', sans-serif" }}
+    >
+      <div className="bg-[#f5f5f8] rounded-[24px] border-[3px] border-[#e0e0e8] shadow-[0_6px_0_#c8c8d4] w-full max-w-[800px] overflow-hidden">
+
+        {/* HEADER */}
+        <div className="flex justify-between items-center px-6 py-4 bg-white border-b-[3px] border-[#e0e0e8]">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-2 h-8 rounded-full"
+              style={{ background: config.color }}
+            />
+            <h2 className="text-xl font-black text-[#222] truncate max-w-md">{item.title}</h2>
+            <span
+              className="px-2 py-0.5 rounded-lg text-[11px] font-extrabold"
+              style={{ background: config.color + '22', color: config.color }}
             >
-              {!item.photo && <span className="text-6xl">📖</span>}
-            </div>
-  
-            {/* INFO */}
-            <div className="flex-1 flex flex-col gap-6">
-  
-              {/* TYPE + STATUS */}
-              <div className="flex items-center gap-3">
-                <span className="px-3 py-1 text-xs rounded-full bg-purple-500/20 text-purple-300 uppercase font-bold">
-                  {item.type}
-                </span>
-  
-                <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="px-3 py-1 text-xs rounded-full bg-slate-700 text-white uppercase font-bold border border-purple-500/30 focus:outline-none focus:border-purple-500"
-                >
-                  <option value="reading">📖 En progreso</option>
+              {config.label}
+            </span>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-9 h-9 bg-[#f4f4f8] border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da] rounded-xl flex items-center justify-center text-[#888] hover:text-[#333] font-black text-lg transition-all"
+          >
+            ×
+          </button>
+        </div>
+
+        {/* BODY */}
+        <div className="flex gap-6 p-6">
+
+          {/* Cover */}
+          <div
+            className="w-44 h-60 rounded-[16px] border-[3px] border-[#e0e0e8] shadow-[0_3px_0_#d0d0da] flex-shrink-0 overflow-hidden flex items-center justify-center text-5xl"
+            style={{
+              background: item.photo ? `url(${item.photo}) center/cover` : '#f4f4f8',
+            }}
+          >
+            {!item.photo && (item.type === "libro" ? "📚" : item.type === "juego" ? "🎮" : "🎬")}
+          </div>
+
+          {/* Controles */}
+          <div className="flex-1 flex flex-col gap-4">
+
+            {/* Status */}
+            <div>
+              <label className="text-[11px] font-extrabold text-[#aaa] uppercase tracking-wider mb-1.5 block">Estado</label>
+              <select
+                value={status}
+                onChange={e => setStatus(e.target.value)}
+                className="w-full bg-white border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da] rounded-xl px-4 py-2.5 text-[14px] font-black text-[#333] focus:outline-none focus:border-[#aaa]"
+                style={{ fontFamily: "'Nunito', sans-serif" }}
+              >
+                {item.type === "libro" && <>
+                  <option value="reading">📖 Leyendo</option>
                   <option value="completed">✅ Completado</option>
                   <option value="abandoned">❌ Abandonado</option>
-                </select>
-              </div>
+                </>}
+                {item.type === "juego" && <>
+                  <option value="playing">🎮 Jugando</option>
+                  <option value="completed">✅ Completado</option>
+                  <option value="abandoned">❌ Abandonado</option>
+                </>}
+                {item.type === "anime" && <>
+                  <option value="watching">📺 Viendo</option>
+                  <option value="completed">✅ Completado</option>
+                  <option value="abandoned">❌ Abandonado</option>
+                </>}
+              </select>
+            </div>
 
-              {/* Autor */}
-              {item.author && (
-                <div>
-                  <p className="text-sm text-white/60">Autor</p>
-                  <p className="text-white font-semibold">{item.author}</p>
-                </div>
-              )}
-  
-              {/* PROGRESS */}
+            {/* Autor */}
+            {item.author && (
               <div>
-                <label className="text-sm text-white/60 mb-2 block">
-                  {item.type === "libro" ? "Página Actual" : item.type === "juego" ? "Horas Jugadas" : "Episodios Vistos"}
-                </label>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="number"
-                    value={progress}
-                    onChange={(e) => setProgress(Number(e.target.value))}
-                    className="w-24 bg-slate-800 p-2 rounded-lg border border-purple-500/30 focus:outline-none focus:border-purple-500 text-white"
-                  />
-                  {item.totalPages && (
-                    <span className="text-sm text-purple-300">/ {item.totalPages}</span>
-                  )}
-                </div>
+                <label className="text-[11px] font-extrabold text-[#aaa] uppercase tracking-wider mb-1 block">Autor</label>
+                <p className="text-[14px] font-black text-[#333]">{item.author}</p>
+              </div>
+            )}
 
-                {/* Progress Bar para libros */}
+            {/* Progreso */}
+            <div>
+              <label className="text-[11px] font-extrabold text-[#aaa] uppercase tracking-wider mb-1.5 block">
+                {item.type === "libro" ? "Página actual" : item.type === "juego" ? "Horas jugadas" : "Episodios vistos"}
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  value={progress}
+                  onChange={e => setProgress(Number(e.target.value))}
+                  className="w-24 bg-white border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da] rounded-xl px-3 py-2 text-[14px] font-black text-[#333] focus:outline-none focus:border-[#aaa]"
+                  style={{ fontFamily: "'Nunito', sans-serif" }}
+                />
                 {item.totalPages && (
-                  <div className="mt-3">
-                    <div className="flex justify-between text-xs text-purple-300 mb-1">
-                      <span>Progreso</span>
-                      <span>{progressPercentage}%</span>
-                    </div>
-                    <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all"
-                        style={{ width: `${progressPercentage}%` }}
-                      ></div>
-                    </div>
-                  </div>
+                  <span className="text-[13px] font-extrabold text-[#aaa]">/ {item.totalPages} páginas</span>
                 )}
               </div>
-  
-              {/* FAVORITE */}
-              <button
-                onClick={() => setIsFavorite(!isFavorite)}
-                className={`px-4 py-2 rounded-lg font-bold w-fit transition-all ${
-                  isFavorite 
-                    ? 'bg-pink-500/30 text-pink-300 border border-pink-500/50' 
-                    : 'bg-slate-700 text-white hover:bg-slate-600'
-                }`}
-              >
-                {isFavorite ? "❤️ Favorito" : "🤍 Marcar como favorito"}
-              </button>
-  
-              {/* REVIEW */}
-              <div>
-                <label className="text-sm text-white/60 mb-2 block">Reseña</label>
-                <textarea
-                  value={review}
-                  onChange={(e) => setReview(e.target.value)}
-                  className="w-full bg-slate-800 p-3 rounded-lg h-20 resize-none border border-purple-500/30 focus:outline-none focus:border-purple-500 text-white"
-                />
-              </div>
-  
+
+              {item.totalPages && (
+                <div className="mt-2">
+                  <div className="flex justify-between text-[11px] font-extrabold text-[#aaa] mb-1">
+                    <span>Progreso</span>
+                    <span>{progressPercentage}%</span>
+                  </div>
+                  <div className="h-2.5 bg-[#e0e0e8] rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{ width: `${progressPercentage}%`, background: config.color }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Reseña */}
+            <div>
+              <label className="text-[11px] font-extrabold text-[#aaa] uppercase tracking-wider mb-1.5 block">Reseña</label>
+              <textarea
+                value={review}
+                onChange={e => setReview(e.target.value)}
+                placeholder="¿Qué te pareció?"
+                rows="3"
+                className="w-full bg-white border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da] rounded-xl px-4 py-3 text-[13px] font-bold text-[#333] focus:outline-none focus:border-[#aaa] resize-none"
+                style={{ fontFamily: "'Nunito', sans-serif" }}
+              />
             </div>
           </div>
-  
-          {/* FOOTER */}
-          <div className="flex justify-end gap-3 p-5 border-t border-white/10">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-slate-700 rounded-lg hover:bg-slate-600 font-bold transition-all"
-            >
-              Cancelar
-            </button>
-  
-            <button
-              onClick={handleSave}
-              disabled={loading}
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg hover:shadow-lg hover:shadow-purple-600/50 font-bold disabled:opacity-50 transition-all"
-            >
-              {loading ? '⏳ Guardando...' : '✨ Guardar cambios'}
-            </button>
-          </div>
-  
+        </div>
+
+        {/* FOOTER */}
+        <div className="flex justify-end gap-3 px-6 py-4 bg-white border-t-[3px] border-[#e0e0e8]">
+          <button
+            onClick={onClose}
+            className="px-5 py-2.5 bg-[#f4f4f8] border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da] rounded-xl font-black text-[13px] text-[#888] hover:text-[#333] hover:bg-white transition-all"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={loading}
+            className="px-5 py-2.5 bg-[#222] border-2 border-[#111] shadow-[0_2px_0_#000] rounded-xl font-black text-[13px] text-white hover:-translate-y-0.5 hover:shadow-[0_4px_0_#000] disabled:opacity-50 transition-all"
+          >
+            {loading ? "⏳ Guardando..." : "✨ Guardar cambios"}
+          </button>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}

@@ -10,7 +10,6 @@ export default function CreateReadingForm({ onSubmit, loading }) {
       rating: 5,
       status: 'reading',
       review: '',
-      isFavorite: false,
       totalPages: '',      // NUEVO
       currentPage: 0       // NUEVO
     }
@@ -154,15 +153,6 @@ export default function CreateReadingForm({ onSubmit, loading }) {
         />
       </div>
 
-      {/* Favorito */}
-      <div className="mb-4 flex items-center">
-        <input
-          type="checkbox"
-          {...register('isFavorite')}
-          className="mr-2 w-4 h-4"
-        />
-        <label className="text-sm font-medium text-purple-300">Marcar como favorito</label>
-      </div>
 
       <button
         type="submit"

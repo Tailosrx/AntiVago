@@ -8,8 +8,12 @@ const updatedUser = await pointService.awardPoints(userId, 10);*/
 // CREATE: Crear lectura
 const createReading = async (req, res, next) => {
   try {
-    const { title, author, category, rating, status, review, isFavorite, totalPages, currentPage } = req.body;
+    const { title, author, category, rating, status, review, photo } = req.body;
     const userId = req.userId;
+
+    // Convertir números correctamente
+    const totalPages = req.body.totalPages ? parseInt(req.body.totalPages) : null;
+    const currentPage = req.body.currentPage ? parseInt(req.body.currentPage) : 0;
 
     if (!title || !category) {
       return res.status(400).json({ error: 'Título y categoría son requeridos' });
@@ -21,27 +25,27 @@ const createReading = async (req, res, next) => {
     const entry = await prisma.readingEntry.create({
       data: {
         userId,
-        type: 'libro',  // ✅ AGREGAR ESTO
+        type: 'libro',
         title,
         author,
         category,
         rating: rating ? parseInt(rating) : null,
         status: status || 'reading',
         review,
-        isFavorite: isFavorite || false,
+        photo: photo || null,
         totalPages: estimatedPages,
-        currentPage: currentPage || 0,
-        progressPercentage: estimatedPages ? Math.round(((currentPage || 0) / estimatedPages) * 100) : 0,
+        currentPage: currentPage,
+        progressPercentage: estimatedPages
+          ? Math.round((currentPage / estimatedPages) * 100)
+          : 0,
         startedAt: new Date(),
         lastUpdatedPage: new Date()
       }
     });
 
     await updateUserCollection(userId, 'reading');
-
     await verifyAndUnlockAchievements(userId);
 
-    
 
     res.status(201).json({
       message: 'Lectura creada',
@@ -56,11 +60,12 @@ const createReading = async (req, res, next) => {
   }
 };
 
+
 const updateReading = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.userId;
-    const { title, author, category, rating, status, review, isFavorite, currentPage } = req.body;
+    const { title, author, category, rating, status, review, currentPage } = req.body;
 
     const reading = await prisma.readingEntry.findUnique({
       where: { id }
@@ -89,7 +94,6 @@ const updateReading = async (req, res, next) => {
         rating: rating ? parseInt(rating) : reading.rating,
         status: status || reading.status,
         review: review !== undefined ? review : reading.review,
-        isFavorite: isFavorite !== undefined ? isFavorite : reading.isFavorite,
         currentPage: currentPage !== undefined ? currentPage : reading.currentPage,
         progressPercentage: progressPercentage,
         finishedAt: status === 'completed' ? new Date() : reading.finishedAt,
@@ -98,6 +102,8 @@ const updateReading = async (req, res, next) => {
     });
 
     await verifyAndUnlockAchievements(userId);
+
+
 
     res.json({
       message: 'Lectura actualizada',
@@ -197,7 +203,7 @@ const deleteReading = async (req, res, next) => {
 // CREATE: Crear juego
 const createGame = async (req, res, next) => {
   try {
-    const { title, category, platform, rating, status, review, hoursPlayed, isFavorite } = req.body;
+    const { title, category, platform, rating, status, review, hoursPlayed, photo } = req.body;
     const userId = req.userId;
 
     if (!title || !category) {
@@ -213,14 +219,13 @@ const createGame = async (req, res, next) => {
         rating: rating ? parseInt(rating) : null,
         status: status || 'playing',
         review,
-        isFavorite: isFavorite || false,
         hoursPlayed: hoursPlayed ? parseInt(hoursPlayed) : 0,
+        photo: photo || null,
         startedAt: new Date()
       }
     });
 
     await updateUserCollection(userId, 'game');
-    await verifyAndUnlockAchievements(userId);
 
     res.status(201).json({
       message: 'Juego creado',
@@ -288,7 +293,7 @@ const updateGame = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.userId;
-    const { title, category, platform, rating, status, review, hoursPlayed, isFavorite } = req.body;
+    const { title, category, platform, rating, status, review, hoursPlayed } = req.body;
 
     const game = await prisma.gameEntry.findUnique({
       where: { id }
@@ -311,13 +316,13 @@ const updateGame = async (req, res, next) => {
         rating: rating ? parseInt(rating) : game.rating,
         status: status || game.status,
         review: review !== undefined ? review : game.review,
-        isFavorite: isFavorite !== undefined ? isFavorite : game.isFavorite,
         hoursPlayed: hoursPlayed ? parseInt(hoursPlayed) : game.hoursPlayed,
         completedAt: status === 'completed' ? new Date() : game.completedAt
       }
     });
 
     await verifyAndUnlockAchievements(userId);
+
 
     res.json({
       message: 'Juego actualizado',
@@ -363,7 +368,7 @@ const deleteGame = async (req, res, next) => {
 // CREATE: Crear anime
 const createAnime = async (req, res, next) => {
   try {
-    const { title, episodes, rating, status, review, isFavorite } = req.body;
+    const { title, episodes, rating, status, review} = req.body;
     const userId = req.userId;
 
     if (!title) {
@@ -378,13 +383,11 @@ const createAnime = async (req, res, next) => {
         rating: rating ? parseInt(rating) : null,
         status: status || 'watching',
         review,
-        isFavorite: isFavorite || false,
         startedAt: new Date()
       }
     });
 
     await updateUserCollection(userId, 'anime');
-    await verifyAndUnlockAchievements(userId);
 
     res.status(201).json({
       message: 'Anime creado',
@@ -450,7 +453,7 @@ const updateAnime = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.userId;
-    const { title, episodes, rating, status, review, isFavorite } = req.body;
+    const { title, episodes, rating, status, review} = req.body;
 
     const anime = await prisma.animeEntry.findUnique({
       where: { id }
@@ -472,12 +475,12 @@ const updateAnime = async (req, res, next) => {
         rating: rating ? parseInt(rating) : anime.rating,
         status: status || anime.status,
         review: review !== undefined ? review : anime.review,
-        isFavorite: isFavorite !== undefined ? isFavorite : anime.isFavorite,
         completedAt: status === 'completed' ? new Date() : anime.completedAt
       }
     });
 
     await verifyAndUnlockAchievements(userId);
+
 
     res.json({
       message: 'Anime actualizado',
@@ -598,19 +601,14 @@ const updateEntry = async (req, res, next) => {
     if (entry) {
       if (entry.userId !== userId) return res.status(403).json({ error: "No autorizado" });
 
-      // Filtrar campos válidos para libros
       const allowed = {
-        status: data.status,
-        review: data.review,
-        isFavorite: data.isFavorite,
-        currentPage: data.currentPage,
+        ...(data.status !== undefined && { status: data.status }),
+        ...(data.review !== undefined && { review: data.review }),
+        ...(data.currentPage !== undefined && { currentPage: data.currentPage }),
       };
 
-      const updated = await prisma.readingEntry.update({
-        where: { id },
-        data: allowed
-      });
-
+      const updated = await prisma.readingEntry.update({ where: { id }, data: allowed });
+      await verifyAndUnlockAchievements(userId); // ✅
       return res.json({ entry: updated });
     }
 
@@ -620,17 +618,13 @@ const updateEntry = async (req, res, next) => {
       if (entry.userId !== userId) return res.status(403).json({ error: "No autorizado" });
 
       const allowed = {
-        status: data.status,
-        review: data.review,
-        isFavorite: data.isFavorite,
-        hoursPlayed: data.hoursPlayed,
+        ...(data.status !== undefined && { status: data.status }),
+        ...(data.review !== undefined && { review: data.review }),
+        ...(data.hoursPlayed !== undefined && { hoursPlayed: data.hoursPlayed }),
       };
 
-      const updated = await prisma.gameEntry.update({
-        where: { id },
-        data: allowed
-      });
-
+      const updated = await prisma.gameEntry.update({ where: { id }, data: allowed });
+      await verifyAndUnlockAchievements(userId); // ✅
       return res.json({ entry: updated });
     }
 
@@ -640,17 +634,13 @@ const updateEntry = async (req, res, next) => {
       if (entry.userId !== userId) return res.status(403).json({ error: "No autorizado" });
 
       const allowed = {
-        status: data.status,
-        review: data.review,
-        isFavorite: data.isFavorite,
-        episodes: data.episodes,
+        ...(data.status !== undefined && { status: data.status }),
+        ...(data.review !== undefined && { review: data.review }),
+        ...(data.episodes !== undefined && { episodes: data.episodes }),
       };
 
-      const updated = await prisma.animeEntry.update({
-        where: { id },
-        data: allowed
-      });
-
+      const updated = await prisma.animeEntry.update({ where: { id }, data: allowed });
+      await verifyAndUnlockAchievements(userId); // ✅
       return res.json({ entry: updated });
     }
 
@@ -750,7 +740,28 @@ const verifyAndUnlockAchievements = async (userId) => {
         shouldUnlock = gamesCompleted >= achievement.requirementCount;
       } else if (achievement.requirementType === 'anime_completed') {
         shouldUnlock = animeCompleted >= achievement.requirementCount;
+      } // 📚 Logro por libro específico
+      else if (achievement.requirementType === 'specific_book') {
+        const exists = await prisma.readingEntry.findFirst({
+          where: {
+            userId,
+            status: 'completed',
+            title: achievement.requirementValue
+          }
+        });
+      
+        shouldUnlock = !!exists;
+      } else if (achievement.requirementType === 'specific_game') {
+        const exists = await prisma.gameEntry.findFirst({
+          where: {
+            userId,
+            status: 'completed',
+            title: achievement.requirementValue
+          }
+        });
+        shouldUnlock = !!exists;
       }
+      
 
       if (shouldUnlock) {
         const exists = await prisma.userAchievement.findUnique({

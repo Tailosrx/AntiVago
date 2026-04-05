@@ -10,6 +10,8 @@ import entriesRoutes from "./routes/entries.js";
 import achievementsRoutes from './routes/achievements.js';
 
 const app = express();
+app.use(express.json({ limit: '10mb'}));
+app.use(express.urlencoded({ extended: true, limit: '10mb'}))
 
 // Middlewares
 app.use(cors({ origin: config.cors.origin }));

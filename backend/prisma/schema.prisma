@@ -46,7 +46,6 @@ model ReadingEntry {
   rating      Int?    @db.SmallInt
   status      String  @default("reading")
   review      String?
-  isFavorite  Boolean @default(false)
   
   totalPages  Int?
   currentPage Int?    @default(0)              // NUEVO
@@ -79,7 +78,7 @@ model GameEntry {
   rating    Int?    @db.SmallInt
   status    String  @default("playing")
   review    String?
-  isFavorite Boolean @default(false)
+
   hoursPlayed Int   @default(0)
 
   startedAt DateTime?
@@ -105,7 +104,6 @@ model AnimeEntry {
   status    String  @default("watching")
   rating    Int?    @db.SmallInt
   review    String?
-  isFavorite Boolean @default(false)
 
   startedAt DateTime?
   completedAt DateTime?
@@ -128,6 +126,8 @@ model Achievement {
 
   requirementType  String?
   requirementCount Int?
+  requirementValue String?   // 👈 AÑADIR ESTO
+
   rarityPercentage Float @default(50)
   secret           Boolean @default(false)  
 
@@ -137,6 +137,7 @@ model Achievement {
 
   @@index([category])
 }
+
 
 // ===== USER ACHIEVEMENTS =====
 model UserAchievement {

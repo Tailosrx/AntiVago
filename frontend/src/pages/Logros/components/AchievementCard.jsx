@@ -1,42 +1,42 @@
 export default function AchievementCard({ title, description, iconSrc, unlocked, rarity, secret }) {
   const isHidden = secret && !unlocked;
 
-  const rarityColors = {
-    bronze: "bg-orange-300/20",
-    silver: "bg-slate-300/20",
-    gold: "bg-yellow-300/20",
-    platinum: "bg-blue-300/20"
-  };
-
   return (
     <div
       className={`
-        relative p-4 h-40 rounded-2xl border border-white/10
-        bg-white/5 backdrop-blur-xl
-        transition-all duration-300
-        ${unlocked ? "opacity-100" : "opacity-40 grayscale"}
-        hover:scale-[1.03] hover:shadow-xl
+        relative p-3 rounded-2xl border-2 flex flex-col items-center gap-2
+        transition-all duration-150 h-36
+        ${unlocked
+          ? "bg-[#f0fdf4] border-[#86efac] shadow-[0_2px_0_#6ee7a0] hover:-translate-y-1 hover:shadow-[0_4px_0_#4ade80]"
+          : "bg-[#f4f4f8] border-[#e4e4ec] shadow-[0_1px_0_#ddd]"
+        }
       `}
     >
-      {unlocked && (
-        <div
-          className={`
-            absolute inset-0 rounded-2xl blur-2xl opacity-20
-            ${rarityColors[rarity]}
-          `}
-        />
-      )}
-
-      <div className="relative z-10 flex justify-center mb-2">
+      <div className={`
+        w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0
+        ${unlocked
+          ? "bg-white shadow-[0_1px_0_#86efac] border border-[#bbf7d0]"
+          : "bg-[#ebebf0]"
+        }
+        ${!unlocked ? "grayscale opacity-30" : ""}
+      `}>
         <img
-          src={isHidden ? "/secret.webp" : iconSrc}
-          className="w-12 h-12 object-contain drop-shadow-md"
+          src={isHidden ? "/locked.webp" : iconSrc}
+          className="w-8 h-8 object-contain"
         />
       </div>
 
-      <h3 className="relative z-10 text-sm font-semibold text-center">
-        {isHidden ? "Logro secreto" : title}
-      </h3>
+      <p className={`text-[16px] font-black text-center leading-tight w-full
+        ${unlocked ? "text-[#166534]" : "text-[#bbb]"}
+      `}>
+        {isHidden ? "???" : title}
+      </p>
+
+      <p className={`text-[13px] text-center leading-tight font-black w-full
+        ${unlocked && !isHidden ? "text-[#232725]" : "invisible"}
+      `}>
+        {isHidden ? "placeholder" : description}
+      </p>
     </div>
   );
 }
