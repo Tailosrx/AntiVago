@@ -14,7 +14,12 @@ app.use(express.json({ limit: '10mb'}));
 app.use(express.urlencoded({ extended: true, limit: '10mb'}))
 
 // Middlewares
-app.use(cors({ origin: config.cors.origin }));
+app.use(cors({
+  origin: ["https://antivago.vercel.app"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 app.use(morgan("dev"));
 app.use(json());
 
