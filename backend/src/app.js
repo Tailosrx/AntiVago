@@ -13,7 +13,7 @@ const app = express();
 
 // CORS — DEBE IR PRIMERO
 app.use(cors({
-  origin: ["https://antivago.vercel.app"],
+  origin: "https://antivago.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
