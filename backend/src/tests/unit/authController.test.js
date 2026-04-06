@@ -32,6 +32,7 @@ describe('Auth Controller', () => {
         email: 'duplicate@example.com',
         username: 'user2',
         password: 'password123'
+        
       });
 
     expect(res.statusCode).toBe(400);

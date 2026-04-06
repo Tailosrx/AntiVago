@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+    <div className="pattern min-h-screen flex items-center justify-center">
       <div className="text-center">
         <h1 className="text-6xl font-bold text-white mb-4"></h1>
         <img className="w-52 justify-center mx-auto"  src="/antivago2.png" alt="Logo de AntiVago" />
