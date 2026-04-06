@@ -57,6 +57,12 @@
 - **CORS** configurado
 
 ---
+## 🚀 Demo en Vivo
+
+**Frontend:** https://readplay.vercel.app  
+**Backend:** https://api.readplay.app
+
+---
 
 ##  Instalación
 
@@ -146,7 +152,7 @@ Sección "Dashboard" → Resumen personal
 ##  Estructura del Proyecto
 
 ```
-NoLoDejes/
+AntiVago/
 ├── backend/
 │   ├── src/
 │   │   ├── controllers/
