@@ -78,8 +78,8 @@ cd backend
 npm install
 
 # Crear archivo .env
-echo "DATABASE_URL=postgresql://usuario:password@localhost:5432/nolodejes
-JWT_SECRET=your_secret_key_here
+echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/readplay_dev
+JWT_SECRET=982ae12e5693199646dcfac58b65e525fb1030a4d3f62d18bac0cc03e1e154f7
 PORT=5000" > .env
 
 # Migrar base de datos
