@@ -474,7 +474,7 @@ const createAnime = async (req, res, next) => {
       }
     });
 
-    
+
 
     await updateUserCollection(userId, 'anime');
 
