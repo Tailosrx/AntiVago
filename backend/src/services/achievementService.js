@@ -61,97 +61,109 @@ export const generateAchievementsForEntry = async (entry) => {
     // 2. Si no está, generar con Gemini
     console.log(`🤖 Generando trofeos con Gemini para: ${entry.title}`);
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const prompt = `Eres un diseñador de videojuegos experto en crear trofeos/logros.
+    const prompt = `You are a game designer expert in creating achievements/trophies.
 
-El usuario acaba de agregar: ${
+The user just added: ${
       entry.type === "libro"
-        ? "un libro"
+        ? "a book"
         : entry.type === "juego"
-        ? "un juego"
-        : "un anime"
+        ? "a game"
+        : "an anime"
     }
 
-Título: ${entry.title}
-${entry.author ? `Autor: ${entry.author}` : ""}
-${entry.category ? `Categoría/Género: ${entry.category}` : ""}
+Title: ${entry.title}
+${entry.author ? `Author: ${entry.author}` : ""}
+${entry.category ? `Category/Genre: ${entry.category}` : ""}
 
-Genera EXACTAMENTE 2 trofeos/logros ÚNICOS y específicos para este ${
-      entry.type
-    }.
+Generate EXACTLY 2 unique and specific trophies/achievements for this ${entry.type}.
 
-REQUISITOS:
-- Nombre catchy (máx 30 caracteres)
-- Descripción corta (máx 50 caracteres)
-- Puntos: 25-100
-- Rareza: 15-50%
-- Emoji relacionado
+REQUIREMENTS:
+- Catchy name (max 30 chars)
+- Short description (max 50 chars)
+- Points: 25-100
+- Rarity: 15-50%
+- Related emoji
 
-Responde SOLO en JSON válido, SIN markdown, SIN explicaciones:
+RESPOND ONLY WITH VALID JSON, NO MARKDOWN, NO EXPLANATIONS:
 [
-  {
-    "name": "Nombre del Trofeo",
-    "description": "Descripción corta",
-    "points": 50,
-    "rarityPercentage": 25,
-    "emoji": "🏆"
-  },
-  {
-    "name": "Otro Trofeo",
-    "description": "Otra descripción",
-    "points": 75,
-    "rarityPercentage": 30,
-    "emoji": "⭐"
-  }
+  {"name": "Trophy Name", "description": "Short desc", "points": 50, "rarityPercentage": 25, "emoji": "🏆"},
+  {"name": "Another Trophy", "description": "Another desc", "points": 75, "rarityPercentage": 30, "emoji": "⭐"}
 ]`;
 
     const result = await model.generateContent(prompt);
     let responseText = result.response.text().trim();
 
+    console.log(`📝 Respuesta bruta de Gemini: ${responseText.substring(0, 200)}...`);
+
     // Limpieza agresiva
     responseText = responseText
       .replace(/```json/gi, "")
       .replace(/```/g, "")
+      .replace(/\\"/g, '"')
       .trim();
 
     // Intento de parseo robusto
-let achievements;
-try {
-  responseText = responseText
-    .replace(/^[^\[\{]+/, "")   // elimina texto antes del JSON
-    .replace(/[^\]\}]+$/, "");  // elimina texto después del JSON
+    let achievements;
+    try {
+      achievements = JSON.parse(responseText);
+    } catch (parseError1) {
+      console.log("❌ Primer intento de parseo falló, intento 2...");
+      try {
+        const start = responseText.indexOf("[");
+        const end = responseText.lastIndexOf("]") + 1;
+        if (start === -1 || end === 0) {
+          throw new Error("No JSON array found");
+        }
+        const sliced = responseText.slice(start, end);
+        console.log(`📝 JSON extraído: ${sliced.substring(0, 200)}...`);
+        achievements = JSON.parse(sliced);
+      } catch (parseError2) {
+        console.log("❌ Segundo intento falló también, usando fallback");
+        throw new Error(`JSON parse failed: ${parseError2.message}`);
+      }
+    }
 
-  achievements = JSON.parse(responseText);
-} catch {
-  const start = responseText.indexOf("[");
-  const end = responseText.lastIndexOf("]") + 1;
-  const sliced = responseText.slice(start, end);
+    // Validar que sea un array
+    if (!Array.isArray(achievements)) {
+      throw new Error("Response is not an array");
+    }
 
-  achievements = JSON.parse(sliced);
-}
+    // Validar estructura
+    achievements = achievements.map((ach) => ({
+      name: String(ach.name || "").substring(0, 30),
+      description: String(ach.description || "").substring(0, 50),
+      points: Math.max(25, Math.min(100, parseInt(ach.points) || 50)),
+      rarityPercentage: Math.max(15, Math.min(50, parseInt(ach.rarityPercentage) || 25)),
+      emoji: String(ach.emoji || "🏆"),
+    }));
 
-
+    console.log(`✅ ${achievements.length} trofeos generados correctamente`);
     return achievements;
+
   } catch (error) {
     console.error("❌ Error generando trofeos:", error.message);
+    console.error("Stack:", error.stack);
 
     // Fallback: trofeos genéricos
-    return [
+    const fallback = [
       {
         name: `${entry.title} Starter`,
-        description: `Comienza con ${entry.title}`,
+        description: `Begin with ${entry.title}`,
         points: 25,
         rarityPercentage: 40,
         emoji: "🎯",
       },
       {
-        name: `Fan de ${entry.title}`,
-        description: `Disfruta cada momento`,
+        name: `${entry.title} Fan`,
+        description: `Enjoy every moment`,
         points: 50,
         rarityPercentage: 30,
         emoji: "❤️",
       },
     ];
+    console.log("📦 Usando trofeos fallback");
+    return fallback;
   }
 };
