@@ -3,18 +3,48 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 const TROPHY_TEMPLATES = {
-  'Elden Ring': [
-    { name: 'Portador de Esquirlas', description: 'Derrota todos los portadores', points: 50, emoji: '⚔️' },
-    { name: 'Espada de Miquella', description: 'Derrota a Malenia', points: 75, emoji: '🗡️' }
+  "Elden Ring": [
+    {
+      name: "Portador de Esquirlas",
+      description: "Derrota todos los portadores",
+      points: 50,
+      emoji: "⚔️",
+    },
+    {
+      name: "Espada de Miquella",
+      description: "Derrota a Malenia",
+      points: 75,
+      emoji: "🗡️",
+    },
   ],
-  'Persona 5 Royale': [
-    { name: 'Líder Metamorfo', description: 'Completa el juego', points: 50, emoji: '🔮' },
-    { name: 'Maestro de Confidentes', description: 'Maxea todos los confidentes', points: 100, emoji: '👥' }
+  "Persona 5 Royale": [
+    {
+      name: "Líder Metamorfo",
+      description: "Completa el juego",
+      points: 50,
+      emoji: "🔮",
+    },
+    {
+      name: "Maestro de Confidentes",
+      description: "Maxea todos los confidentes",
+      points: 100,
+      emoji: "👥",
+    },
   ],
-  'Attack on Titan': [
-    { name: 'Titán Cazador', description: 'Completa la serie', points: 40, emoji: '⚡' },
-    { name: 'Legión de Exploración', description: 'Ve todos los arcos', points: 60, emoji: '🏹' }
-  ]
+  "Attack on Titan": [
+    {
+      name: "Titán Cazador",
+      description: "Completa la serie",
+      points: 40,
+      emoji: "⚡",
+    },
+    {
+      name: "Legión de Exploración",
+      description: "Ve todos los arcos",
+      points: 60,
+      emoji: "🏹",
+    },
+  ],
 };
 
 export const generateAchievementsForEntry = async (entry) => {
@@ -27,18 +57,26 @@ export const generateAchievementsForEntry = async (entry) => {
 
     // 2. Si no está, generar con Gemini
     console.log(`🤖 Generando trofeos con Gemini para: ${entry.title}`);
-    
+
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `Eres un diseñador de videojuegos experto en crear trofeos/logros.
 
-El usuario acaba de agregar: ${entry.type === "libro" ? "un libro" : entry.type === "juego" ? "un juego" : "un anime"}
+El usuario acaba de agregar: ${
+      entry.type === "libro"
+        ? "un libro"
+        : entry.type === "juego"
+        ? "un juego"
+        : "un anime"
+    }
 
 Título: ${entry.title}
 ${entry.author ? `Autor: ${entry.author}` : ""}
 ${entry.category ? `Categoría/Género: ${entry.category}` : ""}
 
-Genera EXACTAMENTE 2 trofeos/logros ÚNICOS y específicos para este ${entry.type}.
+Genera EXACTAMENTE 2 trofeos/logros ÚNICOS y específicos para este ${
+      entry.type
+    }.
 
 REQUISITOS:
 - Nombre catchy (máx 30 caracteres)
@@ -66,38 +104,46 @@ Responde SOLO en JSON válido, SIN markdown, SIN explicaciones:
 ]`;
 
     const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-    
-    // Limpiar markdown si existe
-    const cleanJson = responseText
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
-    
-    const achievements = JSON.parse(cleanJson);
-    
-    console.log(`✅ ${achievements.length} trofeos generados para ${entry.title}`);
-    return achievements;
+    const responseText = result.response.text().trim();
 
+    // Limpieza agresiva
+    responseText = responseText
+      .replace(/```json/gi, "")
+      .replace(/```/g, "")
+      .trim();
+
+    // Intento de parseo robusto
+    let achievements;
+    try {
+      achievements = JSON.parse(responseText);
+    } catch {
+      const start = responseText.indexOf("[");
+      const end = responseText.lastIndexOf("]") + 1;
+      const sliced = responseText.slice(start, end);
+
+      achievements = JSON.parse(sliced);
+    }
+
+    return achievements;
   } catch (error) {
     console.error("❌ Error generando trofeos:", error.message);
-    
+
     // Fallback: trofeos genéricos
     return [
-      { 
-        name: `${entry.title} Starter`, 
-        description: `Comienza con ${entry.title}`, 
-        points: 25, 
+      {
+        name: `${entry.title} Starter`,
+        description: `Comienza con ${entry.title}`,
+        points: 25,
         rarityPercentage: 40,
-        emoji: '🎯'
+        emoji: "🎯",
       },
-      { 
-        name: `Fan de ${entry.title}`, 
-        description: `Disfruta cada momento`, 
-        points: 50, 
+      {
+        name: `Fan de ${entry.title}`,
+        description: `Disfruta cada momento`,
+        points: 50,
         rarityPercentage: 30,
-        emoji: '❤️'
-      }
+        emoji: "❤️",
+      },
     ];
   }
 };
