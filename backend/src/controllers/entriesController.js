@@ -1,9 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
+import { generateAchievementsForEntry } from "../services/achievementService.js";
 
-// ===== READING ENTRIES =====
-/*const newTrophies = await trophyService.checkAndAwardTrophies(userId);
-const updatedUser = await pointService.awardPoints(userId, 10);*/
+
 
 // CREATE: Crear lectura
 const createReading = async (req, res, next) => {
@@ -42,6 +41,36 @@ const createReading = async (req, res, next) => {
         lastUpdatedPage: new Date()
       }
     });
+
+    try {
+      const aiAchievements = await generateAchievementsForEntry({
+        type: 'libro',
+        title,
+        author,
+        category
+      });
+
+      // Crear los trofeos en la BD
+      for (const achievement of aiAchievements) {
+        await prisma.achievement.create({
+          data: {
+            name: achievement.name,
+            description: achievement.description,
+            type: 'reading',
+            category: 'Rata de Biblioteca',
+            iconUrl: achievement.emoji || '📖',
+            points: achievement.points || 25,
+            requirementType: 'specific_book',
+            requirementValue: title,
+            rarityPercentage: achievement.rarityPercentage || 20,
+            secret: true
+          }
+        });
+      }
+      console.log(`✅ Trofeos creados para: ${title}`);
+    } catch (err) {
+      console.log('⚠️ No se pudo generar trofeos, continuando sin ellos...');
+    }
 
     await updateUserCollection(userId, 'reading');
     await verifyAndUnlockAchievements(userId);
@@ -225,6 +254,64 @@ const createGame = async (req, res, next) => {
       }
     });
 
+     try {
+      const aiAchievements = await generateAchievementsForEntry({
+        type: 'libro',
+        title,
+        author,
+        category
+      });
+
+      // Crear los trofeos en la BD
+      for (const achievement of aiAchievements) {
+        await prisma.achievement.create({
+          data: {
+            name: achievement.name,
+            description: achievement.description,
+            type: 'reading',
+            category: 'Rata de Biblioteca',
+            iconUrl: achievement.emoji || '📖',
+            points: achievement.points || 25,
+            requirementType: 'specific_book',
+            requirementValue: title,
+            rarityPercentage: achievement.rarityPercentage || 20,
+            secret: true
+          }
+        });
+      }
+      console.log(`✅ Trofeos creados para: ${title}`);
+    } catch (err) {
+      console.log('⚠️ No se pudo generar trofeos, continuando sin ellos...');
+    }
+
+    try {
+      const aiAchievements = await generateAchievementsForEntry({
+        type: 'juego',
+        title,
+        category,
+        platform
+      });
+
+      for (const achievement of aiAchievements) {
+        await prisma.achievement.create({
+          data: {
+            name: achievement.name,
+            description: achievement.description,
+            type: 'gaming',
+            category: 'Gamer Pro',
+            iconUrl: achievement.emoji || '🎮',
+            points: achievement.points || 25,
+            requirementType: 'specific_game',
+            requirementValue: title,
+            rarityPercentage: achievement.rarityPercentage || 20,
+            secret: true
+          }
+        });
+      }
+    } catch (err) {
+      console.log('⚠️ No se pudo generar trofeos para el juego');
+    }
+
     await updateUserCollection(userId, 'game');
 
     res.status(201).json({
@@ -386,6 +473,8 @@ const createAnime = async (req, res, next) => {
         startedAt: new Date()
       }
     });
+
+    
 
     await updateUserCollection(userId, 'anime');
 
