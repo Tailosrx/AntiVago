@@ -104,7 +104,7 @@ Responde SOLO en JSON válido, SIN markdown, SIN explicaciones:
 ]`;
 
     const result = await model.generateContent(prompt);
-    const responseText = result.response.text().trim();
+    let responseText = result.response.text().trim();
 
     // Limpieza agresiva
     responseText = responseText
