@@ -256,10 +256,10 @@ const createGame = async (req, res, next) => {
 
      try {
       const aiAchievements = await generateAchievementsForEntry({
-        type: 'libro',
+        type: 'gaming',
         title,
-        author,
-        category
+        category,
+        platform
       });
 
       // Crear los trofeos en la BD
