@@ -61,7 +61,7 @@ export const generateAchievementsForEntry = async (entry) => {
     // 2. Si no está, generar con Gemini
     console.log(`🤖 Generando trofeos con Gemini para: ${entry.title}`);
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
     const prompt = `Eres un diseñador de videojuegos experto en crear trofeos/logros.
 
@@ -116,16 +116,21 @@ Responde SOLO en JSON válido, SIN markdown, SIN explicaciones:
       .trim();
 
     // Intento de parseo robusto
-    let achievements;
-    try {
-      achievements = JSON.parse(responseText);
-    } catch {
-      const start = responseText.indexOf("[");
-      const end = responseText.lastIndexOf("]") + 1;
-      const sliced = responseText.slice(start, end);
+let achievements;
+try {
+  responseText = responseText
+    .replace(/^[^\[\{]+/, "")   // elimina texto antes del JSON
+    .replace(/[^\]\}]+$/, "");  // elimina texto después del JSON
 
-      achievements = JSON.parse(sliced);
-    }
+  achievements = JSON.parse(responseText);
+} catch {
+  const start = responseText.indexOf("[");
+  const end = responseText.lastIndexOf("]") + 1;
+  const sliced = responseText.slice(start, end);
+
+  achievements = JSON.parse(sliced);
+}
+
 
     return achievements;
   } catch (error) {
