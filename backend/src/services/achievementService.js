@@ -61,7 +61,7 @@ export const generateAchievementsForEntry = async (entry) => {
     // 2. Si no está, generar con Gemini
     console.log(`🤖 Generando trofeos con Gemini para: ${entry.title}`);
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const prompt = `You are a game designer expert in creating achievements/trophies.
 
