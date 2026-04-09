@@ -43,12 +43,16 @@ const createReading = async (req, res, next) => {
     });
 
     try {
-      const aiAchievements = await generateAchievementsForEntry({
+      const entryData = await generateAchievementsForEntry({
         type: 'libro',
         title,
         author,
         category
       });
+
+      console.log('📌 Datos enviados a Gemini:', entryData);
+      const aiAchievements = await generateAchievementsForEntry(entryData);
+      console.log('📌 Logros retornados:', aiAchievements);
 
       // Crear los trofeos en la BD
       for (const achievement of aiAchievements) {
@@ -255,12 +259,16 @@ const createGame = async (req, res, next) => {
     });
 
      try {
-      const aiAchievements = await generateAchievementsForEntry({
+      const entryData = await generateAchievementsForEntry({
         type: 'gaming',
         title,
         category,
         platform
       });
+
+      console.log('📌 Datos enviados a Gemini:', entryData);
+      const aiAchievements = await generateAchievementsForEntry(entryData);
+      console.log('📌 Logros retornados:', aiAchievements);
 
       // Crear los trofeos en la BD
       for (const achievement of aiAchievements) {
