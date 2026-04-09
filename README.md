@@ -59,8 +59,8 @@
 ---
 ## 🚀 Demo en Vivo
 
-**Frontend:** https://readplay.vercel.app  
-**Backend:** https://api.readplay.app
+ https://readplay.vercel.app  
+
 
 ---
 

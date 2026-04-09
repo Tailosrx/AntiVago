@@ -11,7 +11,7 @@ export default function Home() {
         {/* Logo - Mismo tamaño que Library */}
         <div className="mb-12">
           <img 
-            className="w-56 mx-auto drop-shadow-2xl hover:scale-105 transition-transform duration-300" 
+            className="w-56 mx-auto drop-shadow-2xl " 
             src="/antivago2.png" 
             alt="ReadPlay Logo" 
           />
@@ -74,7 +74,7 @@ export default function Home() {
 
         {/* Footer Link */}
         <p className="mt-12 text-gray-600 text-sm font-bold" style={{ fontFamily: "'Nunito', sans-serif" }}>
-          ¿Problemas? <a href="mailto:soporte@readplay.app" className="text-blue-600 hover:text-purple-600 underline font-black">Contactanos</a>
+          ¿Problemas? <a href="mailto:kevinrx03@gmail.com" className="text-blue-600 hover:text-purple-600 underline font-black">Contactanos</a>
         </p>
       </div>
     </div>
