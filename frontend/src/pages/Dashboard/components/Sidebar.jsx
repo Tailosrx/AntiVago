@@ -16,7 +16,7 @@ export default function Sidebar() {
       {/* Mobile - Hamburger (ocultarse cuando está abierto) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-white border-2 border-[#ddd] shadow-[0_2px_0_#ccc] rounded-lg flex items-center justify-center transition-all ${isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        className={`lg:hidden  top-4 left-4 z-50 w-10 h-10 bg-white border-2 border-[#ddd] shadow-[0_2px_0_#ccc] rounded-lg flex items-center justify-center transition-all ${isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
         <span className="material-symbols-outlined text-[#333]">menu</span>
       </button>
