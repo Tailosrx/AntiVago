@@ -77,6 +77,7 @@ export default function SectionBook({ readings, games, animes, setReadings, setG
         </div>
 
         {/* Ordenar */}
+        <div className="flex justify-center sm:justify-start">
         <div className="flex items-center gap-2 bg-white border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da] rounded-2xl px-4 py-2">
           <span className="text-[12px] font-extrabold text-[#aaa] uppercase tracking-wide">Ordenar</span>
           <select
@@ -90,6 +91,7 @@ export default function SectionBook({ readings, games, animes, setReadings, setG
             <option value="percentage">Progreso</option>
           </select>
         </div>
+      </div>
       </div>
 
       {/* Contador */}
