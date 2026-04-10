@@ -36,17 +36,11 @@ export default function Sidebar() {
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
-        {/* Close button mobile - Solo visible cuando está abierto */}
-        <button
-          onClick={() => setIsOpen(false)}
-          className={`lg:hidden absolute top-4 right-4 text-[#888] transition-all ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        >
-          <span className="material-symbols-outlined text-[22px]">close</span>
-        </button>
+
 
         {/* Logo */}
         <div className="w-12 h-12 bg-white border-2 border-[#ddd] shadow-[0_2px_0_#ccc] rounded-2xl flex items-center justify-center overflow-hidden mb-2">
-          <img src="/antivago2.png" className="w-8 h-8 object-contain" />
+          <img src="/antivago2.png" className="w-8 h-8 object-contain" onClick={() => setIsOpen(false)} />
         </div>
 
         {/* Divider */}
