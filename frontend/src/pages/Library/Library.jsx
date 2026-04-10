@@ -114,27 +114,30 @@ export default function Library() {
   return (
     <div
       className="pattern text-[#222] flex min-h-screen w-full overflow-hidden"
-      style={{
-        fontFamily: "'Nunito', sans-serif",
-      }}
+      style={{ fontFamily: "'Nunito', sans-serif" }}
     >
-      <Sidebar />
-
+      {/* Sidebar: oculto en móvil */}
+      <div className="hidden md:block">
+        <Sidebar />
+      </div>
+  
       <div className="flex flex-col flex-1 overflow-y-auto">
         <Header />
-
-        <main className="flex-1 px-6 py-6 lg:px-12">
-          <div className="bg-[#f5f5f8] rounded-2xl p-6">
-
+  
+        <main className="flex-1 px-4 py-4 sm:px-6 sm:py-6 lg:px-12">
+          <div className="bg-[#f5f5f8] rounded-2xl p-4 sm:p-6">
+  
             {/* Tabs + botón */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex gap-2 bg-white border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da] rounded-2xl p-1.5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+  
+              {/* Tabs scrollables en móvil */}
+              <div className="flex gap-2 bg-white border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da] rounded-2xl p-1.5 overflow-x-auto no-scrollbar">
                 {tabs.map(tab => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
-                      px-5 py-2 rounded-xl text-[14px] font-black transition-all duration-150
+                      px-4 py-2 whitespace-nowrap rounded-xl text-[14px] font-black transition-all duration-150
                       ${activeTab === tab.id
                         ? "bg-[#222] text-white shadow-[0_2px_0_#000]"
                         : "text-[#999] hover:text-[#444] hover:bg-[#f4f4f8]"
@@ -145,17 +148,18 @@ export default function Library() {
                   </button>
                 ))}
               </div>
-
+  
+              {/* Botón agregar */}
               <button
                 onClick={() => { setModalType(activeTab); setShowModal(true); }}
-                className="bg-white border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da] rounded-2xl px-5 py-2.5 text-[14px] font-black text-[#333] hover:bg-[#f4f4f8] hover:-translate-y-0.5 hover:shadow-[0_4px_0_#c8c8d4] transition-all duration-150"
+                className="bg-white border-2 border-[#e0e0e8] shadow-[0_2px_0_#d0d0da] rounded-2xl px-5 py-2.5 text-[14px] font-black text-[#333] hover:bg-[#f4f4f8] hover:-translate-y-0.5 hover:shadow-[0_4px_0_#c8c8d4] transition-all duration-150 w-full sm:w-auto"
               >
-                {activeTab === "books"  && " Agregar Libro"}
-                {activeTab === "games"  && " Agregar Juego"}
-                {activeTab === "animes" && " Agregar Anime"}
+                {activeTab === "books"  && "Agregar Libro"}
+                {activeTab === "games"  && "Agregar Juego"}
+                {activeTab === "animes" && "Agregar Anime"}
               </button>
             </div>
-
+  
             {/* Modales */}
             {showModal && modalType === "books" && (
               <CreateReadingModal onSubmit={handleAddBook} onDelete={handleDeleteBook} onClose={() => setShowModal(false)} />
@@ -166,7 +170,7 @@ export default function Library() {
             {showModal && modalType === "animes" && (
               <CreateAnimeModal onSubmit={handleAddAnime} onClose={() => setShowModal(false)} />
             )}
-
+  
             {/* Contenido */}
             {activeTab === "books" && (
               <SectionBook readings={readings} games={games} animes={animes} setReadings={setReadings} setGames={setGames} setAnimes={setAnimes} type="books" />
@@ -177,10 +181,10 @@ export default function Library() {
             {activeTab === "animes" && (
               <SectionBook readings={readings} games={games} animes={animes} setReadings={setReadings} setGames={setGames} setAnimes={setAnimes} type="animes" />
             )}
-
+  
           </div>
         </main>
       </div>
     </div>
   );
-}
+}  
