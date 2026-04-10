@@ -99,19 +99,19 @@ export default function SectionBook({ readings, games, animes, setReadings, setG
 
       {/* Grid */}
       {sortedItems.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <span className="text-5xl">
-            {type === "books" ? "📚" : type === "games" ? "🎮" : "🎬"}
-          </span>
-          <p className="text-[#aaa] font-extrabold text-[14px]">No hay nada aquí todavía</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
-          {sortedItems.map(item => (
-            <LibraryItem key={item.id} item={item} onClick={() => setSelectedItem(item)} />
-          ))}
-        </div>
-      )}
+  <div className="flex flex-col items-center justify-center py-16 lg:py-20 gap-3">
+    <span className="text-4xl lg:text-5xl">
+      {type === "books" ? "📚" : type === "games" ? "🎮" : "🎬"}
+    </span>
+    <p className="text-[#aaa] font-extrabold text-[12px] lg:text-[14px]">No hay nada aquí todavía</p>
+  </div>
+) : (
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
+    {sortedItems.map(item => (
+      <LibraryItem key={item.id} item={item} onClick={() => setSelectedItem(item)} />
+    ))}
+  </div>
+)}
 
       {/* Modal */}
       {selectedItem && (

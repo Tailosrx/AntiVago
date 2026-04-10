@@ -13,10 +13,10 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile - Hamburger */}
+      {/* Mobile - Hamburger (ocultarse cuando está abierto) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-white border-2 border-[#ddd] shadow-[0_2px_0_#ccc] rounded-lg flex items-center justify-center"
+        className={`lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-white border-2 border-[#ddd] shadow-[0_2px_0_#ccc] rounded-lg flex items-center justify-center transition-all ${isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
         <span className="material-symbols-outlined text-[#333]">menu</span>
       </button>
@@ -36,12 +36,12 @@ export default function Sidebar() {
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
-        {/* Close button mobile */}
+        {/* Close button mobile - Solo visible cuando está abierto */}
         <button
           onClick={() => setIsOpen(false)}
-          className="lg:hidden absolute top-4 right-4 text-[#888]"
+          className={`lg:hidden absolute top-4 right-4 text-[#888] transition-all ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         >
-          <span className="material-symbols-outlined">close</span>
+          <span className="material-symbols-outlined text-[22px]">close</span>
         </button>
 
         {/* Logo */}
