@@ -26,17 +26,21 @@ export default function AchievementCard({ title, description, iconSrc, unlocked,
         />
       </div>
 
-      <p className={`text-xs sm:text-sm md:text-base lg:text-lg font-black text-center leading-tight w-full px-1
-        ${unlocked ? "text-[#166534]" : "text-[#bbb]"}
-      `}>
-        {isHidden ? "???" : title}
-      </p>
+      <div className="w-full px-1 flex-1 flex items-center overflow-x-auto scrollbar-hide">
+        <p className={`text-xs sm:text-sm md:text-base lg:text-lg font-black text-center leading-tight whitespace-nowrap flex-shrink-0
+          ${unlocked ? "text-[#166534]" : "text-[#bbb]"}
+        `}>
+          {isHidden ? "???" : title}
+        </p>
+      </div>
 
-      <p className={`text-[10px] sm:text-xs md:text-sm lg:text-base text-center leading-tight font-black w-full px-1
-        ${unlocked && !isHidden ? "text-[#232725]" : "invisible"}
-      `}>
-        {isHidden ? "placeholder" : description}
-      </p>
+      <div className="w-full px-1 flex-1 flex items-center overflow-x-auto scrollbar-hide">
+        <p className={`text-[10px] sm:text-xs md:text-sm lg:text-base text-center leading-tight font-black whitespace-nowrap flex-shrink-0
+          ${unlocked && !isHidden ? "text-[#232725]" : "invisible"}
+        `}>
+          {isHidden ? "placeholder" : description}
+        </p>
+      </div>
     </div>
   );
 }
