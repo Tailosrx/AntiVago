@@ -17,7 +17,6 @@ export default function Library() {
   const [activeTab, setActiveTab] = useState("books");
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -117,28 +116,8 @@ export default function Library() {
       className="pattern text-[#222] flex min-h-screen w-full overflow-hidden"
       style={{ fontFamily: "'Nunito', sans-serif" }}
     >
-      {/* Hamburger button - Solo móvil */}
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className={`md:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-white border-2 border-[#ddd] shadow-[0_2px_0_#ccc] rounded-lg flex items-center justify-center transition-all ${sidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-      >
-        <span className="material-symbols-outlined text-[#333]">menu</span>
-      </button>
-
-      {/* Sidebar: Desktop normal, Mobile como modal */}
-      <div className={`${sidebarOpen ? 'block' : 'hidden'} md:block`}>
-        <div className={`${sidebarOpen ? 'fixed' : 'relative'} z-40 md:z-auto`}>
-          <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        </div>
-      </div>
-
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="md:hidden fixed inset-0 bg-black/30 z-30"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {/* Sidebar - Maneja su propio estado */}
+      <Sidebar />
   
       <div className="flex flex-col flex-1 overflow-y-auto">
         <Header />
