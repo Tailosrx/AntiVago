@@ -43,15 +43,12 @@ const createReading = async (req, res, next) => {
     });
 
     try {
-      const entryData = await generateAchievementsForEntry({
+      const aiAchievements = await generateAchievementsForEntry({
         type: 'libro',
         title,
         author,
         category
       });
-
-      console.log('📌 Datos enviados a Gemini:', entryData);
-      const aiAchievements = await generateAchievementsForEntry(entryData);
       console.log('📌 Logros retornados:', aiAchievements);
 
       // Crear los trofeos en la BD
@@ -258,48 +255,16 @@ const createGame = async (req, res, next) => {
       }
     });
 
-     try {
-      const entryData = await generateAchievementsForEntry({
-        type: 'gaming',
+    try {
+      const aiAchievements = await generateAchievementsForEntry({
+        type: 'game',
         title,
         category,
         platform
       });
-
-      console.log('📌 Datos enviados a Gemini:', entryData);
-      const aiAchievements = await generateAchievementsForEntry(entryData);
       console.log('📌 Logros retornados:', aiAchievements);
 
       // Crear los trofeos en la BD
-      for (const achievement of aiAchievements) {
-        await prisma.achievement.create({
-          data: {
-            name: achievement.name,
-            description: achievement.description,
-            type: 'reading',
-            category: 'Rata de Biblioteca',
-            iconUrl: achievement.emoji || '📖',
-            points: achievement.points || 25,
-            requirementType: 'specific_book',
-            requirementValue: title,
-            rarityPercentage: achievement.rarityPercentage || 20,
-            secret: true
-          }
-        });
-      }
-      console.log(`✅ Trofeos creados para: ${title}`);
-    } catch (err) {
-      console.log('⚠️ No se pudo generar trofeos, continuando sin ellos...');
-    }
-
-    try {
-      const aiAchievements = await generateAchievementsForEntry({
-        type: 'juego',
-        title,
-        category,
-        platform
-      });
-
       for (const achievement of aiAchievements) {
         await prisma.achievement.create({
           data: {
@@ -316,11 +281,13 @@ const createGame = async (req, res, next) => {
           }
         });
       }
+      console.log(`✅ Trofeos creados para: ${title}`);
     } catch (err) {
-      console.log('⚠️ No se pudo generar trofeos para el juego');
+      console.log('⚠️ No se pudo generar trofeos, continuando sin ellos...');
     }
 
     await updateUserCollection(userId, 'game');
+    await verifyAndUnlockAchievements(userId);
 
     res.status(201).json({
       message: 'Juego creado',
@@ -463,7 +430,7 @@ const deleteGame = async (req, res, next) => {
 // CREATE: Crear anime
 const createAnime = async (req, res, next) => {
   try {
-    const { title, episodes, rating, status, review} = req.body;
+    const { title, episodes, rating, status, review } = req.body;
     const userId = req.userId;
 
     if (!title) {
@@ -482,9 +449,37 @@ const createAnime = async (req, res, next) => {
       }
     });
 
+    try {
+      const aiAchievements = await generateAchievementsForEntry({
+        type: 'anime',
+        title
+      });
+      console.log('📌 Logros retornados:', aiAchievements);
 
+      // Crear los trofeos en la BD
+      for (const achievement of aiAchievements) {
+        await prisma.achievement.create({
+          data: {
+            name: achievement.name,
+            description: achievement.description,
+            type: 'anime',
+            category: 'Otaku Fan',
+            iconUrl: achievement.emoji || '🎌',
+            points: achievement.points || 25,
+            requirementType: 'specific_anime',
+            requirementValue: title,
+            rarityPercentage: achievement.rarityPercentage || 20,
+            secret: true
+          }
+        });
+      }
+      console.log(`✅ Trofeos creados para: ${title}`);
+    } catch (err) {
+      console.log('⚠️ No se pudo generar trofeos para el anime, continuando sin ellos...');
+    }
 
     await updateUserCollection(userId, 'anime');
+    await verifyAndUnlockAchievements(userId);
 
     res.status(201).json({
       message: 'Anime creado',
@@ -550,7 +545,7 @@ const updateAnime = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.userId;
-    const { title, episodes, rating, status, review} = req.body;
+    const { title, episodes, rating, status, review } = req.body;
 
     const anime = await prisma.animeEntry.findUnique({
       where: { id }
@@ -846,7 +841,7 @@ const verifyAndUnlockAchievements = async (userId) => {
             title: achievement.requirementValue
           }
         });
-      
+
         shouldUnlock = !!exists;
       } else if (achievement.requirementType === 'specific_game') {
         const exists = await prisma.gameEntry.findFirst({
@@ -857,8 +852,17 @@ const verifyAndUnlockAchievements = async (userId) => {
           }
         });
         shouldUnlock = !!exists;
+      } else if (achievement.requirementType === 'specific_anime') {
+        const exists = await prisma.animeEntry.findFirst({
+          where: {
+            userId,
+            status: 'completed',
+            title: achievement.requirementValue
+          }
+        });
+        shouldUnlock = !!exists;
       }
-      
+
 
       if (shouldUnlock) {
         const exists = await prisma.userAchievement.findUnique({
