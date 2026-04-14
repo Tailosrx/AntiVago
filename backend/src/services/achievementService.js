@@ -122,7 +122,7 @@ export const generateAchievementsForEntry = async (entry) => {
     
     await waitForRateLimit();
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `You are a game designer expert in creating achievements/trophies.
 
