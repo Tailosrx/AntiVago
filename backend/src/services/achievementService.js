@@ -1,9 +1,15 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from 'dotenv';
+import { PrismaClient } from '@prisma/client';
 
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const prisma = new PrismaClient();
+
+// Control de tasa de solicitudes (rate limiting)
+let lastGeminiCall = 0;
+const GEMINI_CALL_DELAY = 2000; // 2 segundos entre llamadas
 
 const TROPHY_TEMPLATES = {
   "Elden Ring": [
@@ -50,25 +56,80 @@ const TROPHY_TEMPLATES = {
   ],
 };
 
+// Esperar para respetar rate limits
+const waitForRateLimit = async () => {
+  const timeSinceLastCall = Date.now() - lastGeminiCall;
+  if (timeSinceLastCall < GEMINI_CALL_DELAY) {
+    await new Promise(resolve => setTimeout(resolve, GEMINI_CALL_DELAY - timeSinceLastCall));
+  }
+  lastGeminiCall = Date.now();
+};
+
+// Generar trofeos con mejor fallback
+const generateGenericTrophies = (entry) => {
+  const typeIcons = {
+    'libro': '📖',
+    'game': '🎮',
+    'anime': '🎌'
+  };
+
+  const categories = {
+    'libro': { name: 'Lector', icon: '📚' },
+    'game': { name: 'Gamer', icon: '🎯' },
+    'anime': { name: 'Otaku', icon: '⭐' }
+  };
+
+  const icon = typeIcons[entry.type] || '🏆';
+  const category = categories[entry.type] || { name: 'Aventurero', icon: '🗺️' };
+
+  return [
+    {
+      name: `${category.name} Iniciante`,
+      description: `Comienza ${entry.title}`,
+      points: 25,
+      rarityPercentage: 50,
+      emoji: category.icon,
+    },
+    {
+      name: `${category.name} Dedicado`,
+      description: `Completa ${entry.title}`,
+      points: 50,
+      rarityPercentage: 30,
+      emoji: icon,
+    },
+  ];
+};
+
 export const generateAchievementsForEntry = async (entry) => {
   try {
+    // Verificar si Gemini está habilitado
+    const enableGemini = process.env.ENABLE_TROPHY_GENERATION !== 'false';
+    
     // 1. Buscar en templates primero (rápido y gratis)
     if (TROPHY_TEMPLATES[entry.title]) {
       console.log(`✅ Trofeos encontrados en template: ${entry.title}`);
       return TROPHY_TEMPLATES[entry.title];
     }
 
-    // 2. Si no está, generar con Gemini
-    console.log(`🤖 Generando trofeos con Gemini para: ${entry.title}`);
+    // Si Gemini está deshabilitado, usar fallback mejorado
+    if (!enableGemini || !process.env.GOOGLE_API_KEY) {
+      console.log(`⏭️ Generación con Gemini deshabilitada, usando trofeos por defecto`);
+      return generateGenericTrophies(entry);
+    }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    // 2. Si no está en templates, intenta generar con Gemini (con rate limiting)
+    console.log(`🤖 Generando trofeos con Gemini para: ${entry.title}`);
+    
+    await waitForRateLimit();
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `You are a game designer expert in creating achievements/trophies.
 
 The user just added: ${
       entry.type === "libro"
         ? "a book"
-        : entry.type === "juego"
+        : entry.type === "game"
         ? "a game"
         : "an anime"
     }
@@ -120,7 +181,7 @@ RESPOND ONLY WITH VALID JSON, NO MARKDOWN, NO EXPLANATIONS:
         console.log(`📝 JSON extraído: ${sliced.substring(0, 200)}...`);
         achievements = JSON.parse(sliced);
       } catch (parseError2) {
-        console.log("❌ Segundo intento falló también, usando fallback");
+        console.log("❌ Segundo intento falló también, usando fallback mejorado");
         throw new Error(`JSON parse failed: ${parseError2.message}`);
       }
     }
@@ -144,26 +205,9 @@ RESPOND ONLY WITH VALID JSON, NO MARKDOWN, NO EXPLANATIONS:
 
   } catch (error) {
     console.error("❌ Error generando trofeos:", error.message);
-    console.error("Stack:", error.stack);
 
-    // Fallback: trofeos genéricos
-    const fallback = [
-      {
-        name: `${entry.title} Starter`,
-        description: `Begin with ${entry.title}`,
-        points: 25,
-        rarityPercentage: 40,
-        emoji: "🎯",
-      },
-      {
-        name: `${entry.title} Fan`,
-        description: `Enjoy every moment`,
-        points: 50,
-        rarityPercentage: 30,
-        emoji: "❤️",
-      },
-    ];
-    console.log("📦 Usando trofeos fallback");
-    return fallback;
+    // Fallback: trofeos genéricos mejorados
+    console.log("📦 Usando trofeos fallback mejorados");
+    return generateGenericTrophies(entry);
   }
 };
