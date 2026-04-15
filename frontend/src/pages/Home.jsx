@@ -11,9 +11,9 @@ export default function Home() {
         {/* Logo - Mismo tamaño que Library */}
         <div className="mb-12">
           <img 
-            className="w-56 mx-auto drop-shadow-2xl " 
+            className="w-[90mm] mx-auto drop-shadow-2xl " 
             src="/antivago2.png" 
-            alt="ReadPlay Logo" 
+            alt="AntiVago Logo" 
           />
         </div>
 
@@ -27,7 +27,7 @@ export default function Home() {
         {/* Descripción - Mismo color que Login */}
         <p className="text-base md:text-lg text-gray-600 mb-12 leading-relaxed max-w-xl mx-auto"
          style={{ fontFamily: "'Nunito', sans-serif" }}>
-          Registra libros, juegos y animes mientras consigues logros, acumulas puntos y compites en el leaderboard comunitario.
+          Registra libros, juegos y animes mientras consigues logros.
         </p>
 
         
@@ -39,14 +39,14 @@ export default function Home() {
             className="w-full h-auto bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700"
             style={{ fontFamily: "'Nunito', sans-serif" }}
           >
-            ✨ Inicia Sesión
+             Inicia Sesión
           </Link>
           <Link 
             to="/register" 
             className="w-full h-auto bg-green-500 text-white p-2 rounded font-bold hover:bg-green-600"
             style={{ fontFamily: "'Nunito', sans-serif" }}
           >
-            🚀 Crear Cuenta
+             Crear Cuenta
           </Link>
         </div>
 
@@ -73,9 +73,10 @@ export default function Home() {
         </div>
 
         {/* Footer Link */}
-        <p className="mt-12 text-gray-600 text-sm font-bold" style={{ fontFamily: "'Nunito', sans-serif" }}>
-          ¿Problemas? <a href="mailto:kevinrx03@gmail.com" className="text-blue-600 hover:text-purple-600 underline font-black">Contactanos</a>
-        </p>
+        {/* Footer Link */}
+<p className="mt-12 text-gray-600 text-sm font-bold" style={{ fontFamily: "'Nunito', sans-serif" }}>
+  ¿Problemas? <a href="mailto:kevinrx03@gmail.com" className="text-blue-600 hover:text-purple-600 underline font-black">Contáctanos</a>
+</p>
       </div>
     </div>
   );
