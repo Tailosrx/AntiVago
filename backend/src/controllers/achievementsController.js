@@ -140,16 +140,6 @@ const checkAndUnlock = async (req, res, next) => {
       } else if (achievement.requirementType === "streak_7_days") {
         const streak = await calculateUserStreak(userId);
         shouldUnlock = streak >= achievement.requirementCount;
-      } else if (achievement.requirementType === 'specific_game') {
-        const game = await prisma.gameEntry.findFirst({
-          where: {
-            userId,
-            status: 'completed',
-            title: achievement.requirementValue
-          }
-        });
-        shouldUnlock = !!game;
-      
       } else if (achievement.requirementType === 'specific_book') {
         const book = await prisma.readingEntry.findFirst({
           where: {
@@ -159,6 +149,24 @@ const checkAndUnlock = async (req, res, next) => {
           }
         });
         shouldUnlock = !!book;
+      } else if (achievement.requirementType === 'specific_game') {
+        const game = await prisma.gameEntry.findFirst({
+          where: {
+            userId,
+            status: 'completed',
+            title: achievement.requirementValue
+          }
+        });
+        shouldUnlock = !!game;
+      } else if (achievement.requirementType === 'specific_anime') {
+        const anime = await prisma.animeEntry.findFirst({
+          where: {
+            userId,
+            status: 'completed',
+            title: achievement.requirementValue
+          }
+        });
+        shouldUnlock = !!anime;
       }
 
       if (shouldUnlock) {
